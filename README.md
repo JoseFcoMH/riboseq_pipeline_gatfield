@@ -1,5 +1,7 @@
 # Snakemake_pipeline
-** Two distinct Snakemake pipelines to process Ribo-seq and RNA-seq data **
+**Ribo-seq Snakemake pipeline to process Ribo-seq**
 
-Pipeline overview:
+## Pipeline overview:
 
+
+**RNA-seq Snakemake pipeline to process RNA-seq**
