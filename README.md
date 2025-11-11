@@ -25,6 +25,7 @@
 - Plot QC figures
 
 **Pipeline overview for human data:**
+
 -> Same step as for mouse data, except the mapping.
 - Sequential mapping using STAR
     1) human rRNA
@@ -36,3 +37,4 @@
 
 
 ## RNA-seq Snakemake pipeline
+
