@@ -1,5 +1,5 @@
-## Ribo-seq Snakemake pipeline
-**Pipeline overview for mouse data:**
+# Ribo-seq Snakemake pipeline
+## Pipeline overview for mouse data:
 - Download sequencing data (if needed)
     - You need to manually create a file called "samples.links" containing the links to download the Ribo-seq data.
     - The links should contain the following four arguments: LibID_LaneID_ReadID_RunID.fastq.gz. For example, "PF007_L1_R1_001.fastq.gz"
@@ -24,7 +24,7 @@
 - Extract QC statistics
 - Plot QC figures
 
-**Pipeline overview for human data:**
+## Pipeline overview for human data:
 
 -> Same step as for mouse data, except the mapping.
 - Sequential mapping using STAR
@@ -36,5 +36,6 @@
 - Perform human genome mapping using STAR with RSEM parameters (mapping on genome and projection on transcriptome)
 
 
-## RNA-seq Snakemake pipeline
+# RNA-seq Snakemake pipeline
+## Pipeline overview for mouse data:
 
