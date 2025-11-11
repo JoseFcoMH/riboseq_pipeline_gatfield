@@ -1,11 +1,9 @@
-# Snakemake_pipeline
 ## Ribo-seq Snakemake pipeline
-
 **Pipeline overview:**
 - Download sequencing data (if needed)
     - You need to manually create a file called "samples.links" containing the links to download the Ribo-seq data.
-    - The links should contain the following four arguments: <LIB_ID>_<LANE_ID>_<READ_ID>_<RUN_ID>.fastq.gz. For example, "PF007_L1_R1_001.fastq.gz"
-- Combine fastq files according to <LIB_ID>. For example, "PF007_L1_R1_001.fastq.gz" and "PF007_L2_R1_001.fastq.gz" will be combined.
+    - The links should contain the following four arguments: LibID_LaneID_ReadID_RunID>.fastq.gz. For example, "PF007_L1_R1_001.fastq.gz"
+- Combine fastq files according to LibID. For example, "PF007_L1_R1_001.fastq.gz" and "PF007_L2_R1_001.fastq.gz" will be combined.
 - Perform FastQC
 - Perform Trim Galore
 - Perform "UMI-tools whitelist"
