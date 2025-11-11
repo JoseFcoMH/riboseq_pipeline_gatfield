@@ -6,6 +6,12 @@ Currently, you can use the pipeline by copying all files present in [`RiboSeq/mo
 
 If you need any help, please contact virginie.ricci@unil.ch.
 
+Prerequisites:
+[demuxbyname.sh](https://github.com/bbushnell/BBTools/blob/master/demuxbyname.sh) # in my case: accessed using full path to the command
+[consume.py](https://github.com/gatfieldlab/pipeline/tree/master/gatlab/pipeline/consume.py) # in my case: accessed via the module 'pipeline'
+seqkt # in my case: accessed using full path to the command
+
+
 # Ribo-seq Snakemake pipeline
 ## Pipeline overview for mouse data:
 - Download sequencing data (if needed)
