@@ -1,0 +1,1189 @@
+#!/usr/bin/env python3
+
+import os, sys
+import pandas as pd
+import numpy as np
+import glob 
+import re
+import subprocess
+
+##############################
+## functions ##
+def SRA_samples(df_f):
+    df = pd.read_csv(df_f, sep='\t')
+    return df
+
+def getLIMS_samples(df_f, prefix, run_nb):
+    df = pd.read_csv(df_f, sep='\t', header=None)
+    tmp = pd.DataFrame(df[0].str.replace('https://api-uhts-lgtf.unil.ch/symlink/', '').str.split('_', expand=True))
+    tmp[1] = tmp[1].str.replace('L', '')
+    df[1] = tmp[0] + '_' + run_nb + '_' + tmp[1] + '_' + tmp[3] + '_' + tmp[2]
+    df[2] = df[1] + '.fastq.gz'
+    df_final = pd.DataFrame()
+    df_final[0] = tmp[1]
+    df_final[1] = tmp[3]
+    df_final[2] = tmp[2]
+    df_final[3] = tmp[0] + '_' + run_nb + '_' + tmp[1] + '_' + tmp[3]
+    df_final[4] = tmp[0] + '_' + run_nb + '_' + tmp[1] + '_' + tmp[3] + '_' + tmp[2]
+    df_final[5] = tmp[0] + '_' + run_nb + '_' + tmp[1] + '_' + tmp[3] + '_' + tmp[2] + '.fastq.gz'
+    df_final[6] = tmp[0]
+    df_final[7] = run_nb
+    df_final.to_csv(prefix + '_samples.db', sep='\t', index=False, header=False)
+    return (df, df_final)
+    # >> 1       001     R1      PF72_2611_1_001 PF72_2611_1_001_R1      PF72_2611_1_001_R1.fastq.gz     PF72    2611
+
+##############################
+
+
+configfile: 'config.yaml'
+
+envmodules = config['envmodules']
+
+prefix = config['prefix']
+run_nb = config['run_nb']
+source = config['source']
+LIMS_f = config['LIMS_samples']
+SRA_f = config['SRA_samples']
+refs = config['refs']
+STAR_refs_path = config['STAR_refs_path']
+STAR_refs_params = config['STAR_refs_params']
+ref_genome = config['ref_genome']
+ref_GTF = config['ref_GTF']
+ref_version = config['ref_version']
+RSEM_path = config['RSEM_path']
+
+trimgalore = config['trimgalore']
+umi_whitelist = config['umi_whitelist']
+umi_extract = config['umi_extract']
+umi_dedup = config['umi_dedup']
+consume = config['consume']
+fastx_toolkit = config['fastx_toolkit']
+seqtk = config['seqtk']
+demuxbyname = config['demuxbyname']
+
+work_dir = config['work_dir']
+script = work_dir + 'scripts/'
+config_dir = work_dir + 'config/'
+raw_data = work_dir + 'raw_data/'
+umi_data = work_dir + 'umi_data/'
+trimmed_data = work_dir + 'trimmed_data/'
+filtered_data = work_dir + 'filtered_data/'
+mapping_data = work_dir + 'mapping_data/'
+rsem_data = work_dir + 'RSEM/'
+stats_data = work_dir + 'stats/'
+stats_plot = work_dir + 'stats/plots/'
+
+
+LIMS = pd.DataFrame()
+
+#######
+## LIMS
+#######
+if source == 'LIMS':
+
+    LIMS_link = list(getLIMS_samples(LIMS_f, prefix, run_nb)[0][0])
+    nb_LIMS=len(LIMS_link)
+    LIMS = getLIMS_samples(LIMS_f, prefix, run_nb)[1]
+
+    shell('mkdir -p ' + raw_data)
+    shell('cut -f4 ' + prefix + '_samples.db' + ' | uniq > ' + raw_data + prefix + '_data.txt')
+    shell('cut -d"_" -f1 ' + raw_data + prefix + '_data.txt' + ' | sort | uniq > ' + raw_data + prefix + '_data_uniq.txt')
+
+    # TODO
+    command_LIMS = expand('wget {link_i} -O ' + raw_data + '{lims}', zip, link_i=LIMS_link, lims=LIMS[5])
+
+    ##############################
+    ## Download .fastq.gz from LIMS
+    ##############################
+
+    if os.path.isfile(LIMS_f):
+        rule getLIMS:
+            output:
+                gz = expand(raw_data + '{lims}', lims=LIMS[5])
+
+            run:
+                for i in range(nb_LIMS):
+                    print(command_LIMS[i])
+                    shell(command_LIMS[i])
+    
+    else:
+        print('The file "LIMS_samples" was not found.')
+
+    # TODO
+    #shell('seqkit head -n 1000 raw_data/PF72_2611_1_001_R1.fastq.gz > raw_data/PF72_SUB.fastq')
+    #shell('gzip raw_data/PF72_SUB.fastq')
+
+######
+## SRA
+######
+elif source == 'SRA':
+
+    SRA = SRA_samples(SRA_f)
+    SRR = list(SRA['SRR'])
+    nb_SRA=len(SRR)
+
+    command_SRA = expand('fastq-dump --gzip {srr_i} -O ' + raw_data, zip, srr_i=SRA['SRR'])
+
+    ##############################
+    ## Download .fastq.gz from SRA
+    ##############################
+
+    if os.path.isfile(SRA_f):
+        rule getSRA:
+            output:
+                gz = expand(raw_data + '{SRA}.fastq.gz', SRA=SRA['SRR'])
+
+            run:
+                for i in range(nb_SRA):
+                    print(command_SRA[i])
+                    shell(command_SRA[i])
+    else:
+        print('The file "SRA_samples" was not found.')
+
+elif source == '':
+        print('The files .fastq.gz are already present in raw_data/. No downloading.')
+        SAMPLES_GZ = [os.path.basename(x) for x in glob.glob('raw_data/P*_R1.fastq.gz')]
+        SAMPLES = [f.replace('.fastq.gz', '') for f in SAMPLES_GZ]
+
+        df_final = pd.DataFrame()
+        for f in SAMPLES:
+            splits = f.split('_')
+            lib = splits[0]
+            runID = splits[1]
+            lane = splits[2]
+            seqID = splits[3]
+            readID = splits[4]
+            ID = lib + '_' + runID + '_' + lane + '_' + seqID
+            ID_bis = ID + '_' + readID
+            fastq = ID_bis + '.fastq.gz'
+            df_final = df_final._append({'lane': lane, 'seqID': seqID, 'readID': readID, 'ID': ID, 'ID_bis': ID_bis, 'fastq': fastq, 'lib': lib, 'runID': runID}, ignore_index=True)
+        
+        df_final.to_csv(prefix + '_samples.db', sep='\t', index=False, header=False)
+        df_final.columns = range(0, len(df_final.columns))
+        LIMS = df_final
+
+        shell('mkdir -p ' + raw_data)
+        shell('cut -f4 ' + prefix + '_samples.db' + ' | uniq > ' + raw_data + prefix + '_data.txt')
+        shell('cut -d"_" -f1 ' + raw_data + prefix + '_data.txt' + ' | sort | uniq > ' + raw_data + prefix + '_data_uniq.txt')
+        
+else:
+    print('The parameter "source" should be either "LIMS", "SRA" or "".')
+
+
+# TODO
+# SAMPLES_GZ = [os.path.basename(x) for x in glob.glob('raw_data/P*.gz')]
+# SAMPLES = [f.replace('.fastq.gz', '') for f in SAMPLES_GZ]
+SAMPLES = sorted(list(set(LIMS[4])))
+print('Samples')
+print(SAMPLES) # ['PF72_2611_2_001_R1', 'PF73_2611_1_001_R1', 'PF72_2611_1_001_R1', 'PF73_2611_2_001_R1']
+uniq_SAMPLES = sorted(list(set(LIMS[6])))
+print(uniq_SAMPLES) # PF72, PF73, ...
+SAMPLES_TYPE = dict() # monosome, disome, ...
+SAMPLES_RANGE = dict() # 28 37, 45 70, ... 
+# consume = {"PF":"28 37", "PD":"45 70", "PT":"23 62", "P3":"75 100"}
+# for f in SAMPLES:
+for f in uniq_SAMPLES:
+    ribotype=f[:2]
+    SAMPLES_TYPE[f] = ribotype
+    SAMPLES_RANGE[f] = consume[ribotype]
+
+
+
+##############################
+## Run all
+##############################
+rule all:
+    input:
+        expand(raw_data + '{sample_uniq}_fastqc.html', sample_uniq=uniq_SAMPLES),
+        expand(raw_data + '{sample_uniq}.fastq.gz', sample_uniq=uniq_SAMPLES),
+        expand(trimmed_data + '{sample_uniq}_trimmed.fq.gz', sample_uniq=uniq_SAMPLES),
+        expand(trimmed_data + '{sample_uniq}_trimming.log', sample_uniq=uniq_SAMPLES),
+        expand(umi_data + '{sample_uniq}.whitelist', sample_uniq=uniq_SAMPLES),
+        expand(filtered_data + '{sample_uniq}_final.fastq.gz', sample_uniq=uniq_SAMPLES),
+        expand(filtered_data + '{sample_uniq}_final_fastqc.html', sample_uniq=uniq_SAMPLES),
+        expand(mapping_data + 'STAR/{sample_uniq}/mouse_rRNA.Unmapped.out.mate1', sample_uniq=uniq_SAMPLES),
+        expand(mapping_data + 'STAR/{sample_uniq}/human_rRNA.Unmapped.out.mate1', sample_uniq=uniq_SAMPLES),
+        expand(mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1', sample_uniq=uniq_SAMPLES),
+        expand(mapping_data + 'STAR/{sample_uniq}/mouse_cDNA.Unmapped.out.mate1', sample_uniq=uniq_SAMPLES),
+        RSEM_path + 'Genome',
+        expand(mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.flagstats', sample_uniq=uniq_SAMPLES),
+        expand(mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.barcodes', sample_uniq=uniq_SAMPLES),
+        expand(rsem_data + '{sample_uniq}/STAR.txt', sample_uniq=uniq_SAMPLES),
+        expand(rsem_data + '{sample_uniq}/DEDUP.txt', sample_uniq=uniq_SAMPLES),
+        expand(rsem_data + '{sample_uniq}/FORWARD.txt', sample_uniq=uniq_SAMPLES),
+        expand(rsem_data + '{sample_uniq}/RSEM.txt', sample_uniq=uniq_SAMPLES),
+        expand(rsem_data + '{sample_uniq}/DEPTH.txt', sample_uniq=uniq_SAMPLES),
+        stats_data + 'Stats.txt',
+        stats_data + 'Stats_len.txt',
+        expand(stats_data + '{sample_uniq}' + '_stats.txt', sample_uniq=uniq_SAMPLES),
+        expand(stats_data + '{sample_uniq}' + '_stats_len.txt', sample_uniq=uniq_SAMPLES),
+        expand(stats_data + '{sample_uniq}' + '_raw_readLenDist.dat', sample_uniq=uniq_SAMPLES),
+        expand(stats_data + '{sample_uniq}' + '_trimmed_readLenDist.dat', sample_uniq=uniq_SAMPLES),
+        expand(stats_data + '{sample_uniq}' + '_filtered_readLenDist.dat', sample_uniq=uniq_SAMPLES),
+        expand(stats_data + '{sample_uniq}' + '_dedup.dat', sample_uniq=uniq_SAMPLES),
+        expand(stats_data + '{sample_uniq}' + '_RSEM.dat', sample_uniq=uniq_SAMPLES),
+        stats_data + 'plots/' + '01_Preprocessing.pdf',
+        stats_data + 'plots/' + '02_SequentialMapping.pdf',
+        stats_data + 'plots/' + '02_SequentialMapping_bis.pdf',
+        stats_data + 'plots/' + '03_SplitBarcode.pdf',
+        stats_data + 'plots/' + '04_GenomeMapping.pdf',
+        stats_data + 'plots/' + '04_GenomeMapping_bis.pdf',
+        stats_data + 'plots/' + '04_GenomeMappingSplitBarcode.pdf',
+        stats_data + 'plots/' + '05_DuplicationRate.pdf',
+        stats_data + 'plots/' + '06_AllMapping.pdf',
+        stats_data + 'plots/' + '06_AllMapping_bis.pdf',
+        stats_data + 'plots/' + '07_GenomeMappingTypes.pdf',
+        stats_data + 'plots/' + '08_ReadLen_trimmed.pdf',
+        stats_data + 'plots/' + '09_ReadLen_filtered.pdf',
+        stats_data + 'plots/' + '10_ReadLen_onTranscriptome.pdf',
+        stats_data + 'plots/' + '11_RSEM_TotalExpectedCounts.pdf',
+
+        
+
+
+
+##########################################################################################################################
+## Gzip, fastqc, reads trimming, barcode extraction, barcode filtering, size filtering, quality filtering, fastqc
+##########################################################################################################################
+rule combine_fastq:
+    input: 
+        db = work_dir + prefix + '_samples.db',
+        gz = expand(raw_data + '{sample}.fastq.gz', sample=SAMPLES),
+
+    output:
+        cat_gz = expand(raw_data + '{sample_uniq}.fastq.gz', sample_uniq = uniq_SAMPLES),
+
+    params:
+        sample_uniq = uniq_SAMPLES,
+        raw_data = raw_data,
+
+    shell:
+        """
+        for x in {params.sample_uniq}; do
+            echo $x
+            ls {params.raw_data}${{x}}_*.fastq.gz
+            cat {params.raw_data}${{x}}_*.fastq.gz > {params.raw_data}${{x}}.fastq.gz
+        done
+
+        """
+
+
+
+rule raw_fastqc:
+    input:
+        gz = raw_data + '{sample_uniq}.fastq.gz',
+    
+    output:
+        fastqc = raw_data + '{sample_uniq}_fastqc.html',
+
+    envmodules:
+        envmodules['fastqc'],
+
+    shell:
+        """
+        fastqc --noextract {input.gz}
+        """
+
+
+# rule trimming:
+#     input:
+#         gz = raw_data + '{sample_uniq}.fastq.gz',
+#         fastqc = raw_data + '{sample_uniq}_fastqc.html',
+
+#     output:
+#         trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fastq.gz',
+#         trimmed_log = trimmed_data + '{sample_uniq}_trimming.log',
+
+#     params:
+#         cutadapt = cutadapt,
+#         umi_whitelist = umi_whitelist,
+
+#     envmodules:
+#         envmodules['cutadapt'],
+#         envmodules['UMI-tools'],
+
+#     shell:
+#         """
+#         gzip -dc {input.gz} | \\
+#         cutadapt --cores=0 {params.cutadapt} - 2> {output.trimmed_log} | \\
+#         gzip 1> {output.trimmed_gz}
+#         """
+
+
+
+rule trim_galore:
+    input:
+        gz = raw_data + '{sample_uniq}.fastq.gz',
+        fastqc = raw_data + '{sample_uniq}_fastqc.html',
+
+    output:
+        trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fq.gz',
+        # trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fastq.gz',
+        trimmed_log = trimmed_data + '{sample_uniq}_trimming.log',
+
+    params:
+        trimmed_data = trimmed_data,
+        trimgalore = trimgalore,
+        
+
+    envmodules:
+        envmodules['trimgalore']
+
+    shell:
+        """
+        trim_galore --cores 8 --output_dir {params.trimmed_data} {params.trimgalore} {input.gz} 1> {output.trimmed_log} 2>&1
+        """
+
+
+
+rule barcode_whitelist:
+    input:
+        gz = raw_data + '{sample_uniq}.fastq.gz',
+        fastqc = raw_data + '{sample_uniq}_fastqc.html',
+
+        trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fq.gz',
+        # trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fastq.gz',
+    
+    output:
+        whitelist = umi_data + '{sample_uniq}.whitelist',
+        whitelist_log = umi_data + '{sample_uniq}_whitelist.log',
+
+    params:
+        umi_whitelist = umi_whitelist,
+
+    envmodules:
+        envmodules['UMI-tools'],
+
+    shell:
+        """
+        umi_tools whitelist -I {input.trimmed_gz} {params.umi_whitelist} 2>> {output.whitelist_log} 1> {output.whitelist}
+        """
+
+
+
+rule preprocess:
+    input:
+        gz = raw_data + '{sample_uniq}.fastq.gz',
+
+        trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fq.gz',
+        # trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fastq.gz',
+        
+        whitelist = umi_data + '{sample_uniq}.whitelist',
+    
+    output:
+        extr_log = umi_data + '{sample_uniq}_extract.log',
+
+        size_log = filtered_data + '{sample_uniq}_size.log',
+
+        qual_log = filtered_data + '{sample_uniq}_qual.log',
+
+        clean_fastq_gz = filtered_data + '{sample_uniq}_clean.fastq.gz',
+
+        final_fastq_gz = filtered_data + '{sample_uniq}_final.fastq.gz',
+
+    params:
+        umi_whitelist = umi_whitelist,
+        umi_extract = umi_extract,
+        consume = consume,
+        fastx_toolkit = fastx_toolkit,
+        seqtk = seqtk,
+        ribo = lambda wildcards: SAMPLES_RANGE[wildcards.sample_uniq],
+        clean_fastq = filtered_data + '{sample_uniq}_clean.fastq',
+        final_fastq = filtered_data + '{sample_uniq}_final.fastq',
+
+    envmodules:
+        envmodules['fastqc'],
+        envmodules['UMI-tools'],
+        envmodules['pipeline'],
+        envmodules['fastx_toolkit'],
+
+    shell:
+        """
+        umi_tools extract -I {input.trimmed_gz} --whitelist {input.whitelist} {params.umi_extract} 2> {output.extr_log} | \\
+        consume {params.ribo} 2> {output.size_log} | \\
+        fastq_quality_filter {params.fastx_toolkit} 2> {output.qual_log} 1> {params.clean_fastq}
+        
+        {params.seqtk} trimfq -b 2 {params.clean_fastq} > {params.final_fastq}
+        gzip -f {params.clean_fastq} 1> {output.clean_fastq_gz}
+        gzip -f {params.final_fastq} 1> {output.final_fastq_gz}
+        """
+
+
+
+rule final_fastqc:
+    input:
+        final_fastq_gz = filtered_data + '{sample_uniq}_final.fastq.gz',
+    
+    output:
+        final_fastqc = filtered_data + '{sample_uniq}_final_fastqc.html',
+
+    envmodules:
+        envmodules['fastqc'],
+
+    shell:
+        """
+        fastqc --noextract {input.final_fastq_gz}
+        """
+
+
+
+## STAR genomeGenerate
+print('Reference files for mapping:')
+for ref in refs:
+    if os.path.isfile(STAR_refs_path[ref] + 'Genome'):
+        print(ref, ': OK')
+    else:
+        print(ref, ': ERROR !!! Please run prepare_STAR_refs.sh and restart Snakemake.')
+        exit
+
+
+
+rule mapping_mouse_rRNA:
+    input:
+        final_fastqc = filtered_data + '{sample_uniq}_final_fastqc.html',
+        final_fastq_gz = filtered_data + '{sample_uniq}_final.fastq.gz',
+
+    output:
+        mapping_log = mapping_data + 'STAR/log/{sample_uniq}.mouse_rRNA.log',
+        unmapped = mapping_data + 'STAR/{sample_uniq}/mouse_rRNA.Unmapped.out.mate1',
+    
+    params:
+        mapping_data = mapping_data,
+        ref_path = STAR_refs_path['mouse_rRNA'],
+        ref_params = STAR_refs_params['mouse_rRNA'],
+        
+
+    envmodules:
+        envmodules['STAR']
+
+    shell:
+        """
+        STAR --runThreadN 12 --twopassMode Basic \\
+            --genomeDir {params.ref_path} \\
+            --readFilesIn {input.final_fastq_gz} \\
+            --readFilesCommand zcat \\
+            --outFileNamePrefix {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_rRNA. \\
+            --outTmpDir {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_rRNA \\
+            {params.ref_params} >(tee /dev/null) -S /dev/null - 2> {output.mapping_log}
+
+        touch {output.unmapped}
+
+        rm -r {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_rRNA._STARpass1
+        rm -r {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_rRNA._STARgenome
+        rm -r {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_rRNA.Log.progress.out
+        """
+
+
+
+rule mapping_human_rRNA:
+    input:
+        unmapped = mapping_data + 'STAR/{sample_uniq}/mouse_rRNA.Unmapped.out.mate1',
+
+    output:
+        mapping_log = mapping_data + 'STAR/log/{sample_uniq}.human_rRNA.log',
+        unmapped = mapping_data + 'STAR/{sample_uniq}/human_rRNA.Unmapped.out.mate1',
+    
+    params:
+        mapping_data = mapping_data,
+        ref_path = STAR_refs_path['human_rRNA'],
+        ref_params = STAR_refs_params['human_rRNA'],
+        
+
+    envmodules:
+        envmodules['STAR']
+
+    shell:
+        """
+        STAR --runThreadN 12 --twopassMode Basic \\
+            --genomeDir {params.ref_path} \\
+            --readFilesIn {input.unmapped} \\
+            --outFileNamePrefix {params.mapping_data}/STAR/{wildcards.sample_uniq}/human_rRNA. \\
+            --outTmpDir {params.mapping_data}/STAR/{wildcards.sample_uniq}/human_rRNA \\
+            {params.ref_params} >(tee /dev/null) -S /dev/null - 2> {output.mapping_log}
+
+        touch {output.unmapped}
+
+        rm -r {params.mapping_data}/STAR/{wildcards.sample_uniq}/human_rRNA._STARpass1
+        rm -r {params.mapping_data}/STAR/{wildcards.sample_uniq}/human_rRNA._STARgenome
+        rm -r {params.mapping_data}/STAR/{wildcards.sample_uniq}/human_rRNA.Log.progress.out
+        """
+
+
+
+rule mapping_mouse_tRNA:
+    input:
+        unmapped = mapping_data + 'STAR/{sample_uniq}/human_rRNA.Unmapped.out.mate1',
+
+    output:
+        mapping_log = mapping_data + 'STAR/log/{sample_uniq}.mouse_tRNA.log',
+        unmapped = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1',
+    
+    params:
+        mapping_data = mapping_data,
+        ref_path = STAR_refs_path['mouse_tRNA'],
+        ref_params = STAR_refs_params['mouse_tRNA'],
+        
+
+    envmodules:
+        envmodules['STAR']
+
+    shell:
+        """
+        STAR --runThreadN 12 --twopassMode Basic \\
+            --genomeDir {params.ref_path} \\
+            --readFilesIn {input.unmapped} \\
+            --outFileNamePrefix {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_tRNA. \\
+            --outTmpDir {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_tRNA \\
+            {params.ref_params} >(tee /dev/null) -S /dev/null - 2> {output.mapping_log}
+
+        touch {output.unmapped}
+
+        rm -r {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_tRNA._STARpass1
+        rm -r {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_tRNA._STARgenome
+        rm -r {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_tRNA.Log.progress.out
+        """
+
+
+
+rule mapping_mouse_cDNA:
+    input:
+        unmapped = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1',
+
+    output:
+        mapping_log = mapping_data + 'STAR/log/{sample_uniq}.mouse_cDNA.log',
+        unmapped = mapping_data + 'STAR/{sample_uniq}/mouse_cDNA.Unmapped.out.mate1',
+        mapped = mapping_data + 'STAR/{sample_uniq}/mouse_cDNA.Aligned.sortedByCoord.out.bam',
+    
+    params:
+        mapping_data = mapping_data,
+        ref_path = STAR_refs_path['mouse_cDNA'],
+        ref_params = STAR_refs_params['mouse_cDNA'],
+
+    envmodules:
+        envmodules['STAR']
+
+    shell:
+        """
+        STAR --runThreadN 12 --twopassMode Basic \\
+            --genomeDir {params.ref_path} \\
+            --readFilesIn {input.unmapped} \\
+            --outFileNamePrefix {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_cDNA. \\
+            --outTmpDir {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_cDNA \\
+            {params.ref_params} >(tee /dev/null) -S /dev/null - 2> {output.mapping_log}
+
+        touch {output.unmapped}
+
+        rm -r {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_cDNA._STARpass1
+        rm -r {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_cDNA._STARgenome
+        rm -r {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_cDNA.Log.progress.out
+        """
+
+
+
+rule mapping_mouse_genome:
+    input:
+        unmapped = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1',
+        unmapped_cDNA = mapping_data + 'STAR/{sample_uniq}/mouse_cDNA.Unmapped.out.mate1',
+
+    output:
+        mapping_log = mapping_data + 'STAR/log/{sample_uniq}.mouse_genome.log',
+        unmapped = mapping_data + 'STAR/{sample_uniq}/mouse_genome.Unmapped.out.mate1',
+        mapped = mapping_data + 'STAR/{sample_uniq}/mouse_genome.Aligned.sortedByCoord.out.bam',
+    
+    params:
+        mapping_data = mapping_data,
+        ref_path = STAR_refs_path['mouse_genome'],
+        ref_params = STAR_refs_params['mouse_genome'],
+
+    envmodules:
+        envmodules['STAR']
+
+    shell:
+        """
+        STAR --runThreadN 12 --twopassMode Basic \\
+            --genomeDir {params.ref_path} \\
+            --readFilesIn {input.unmapped} \\
+            --outFileNamePrefix {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_genome. \\
+            --outTmpDir {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_genome \\
+            {params.ref_params} >(tee /dev/null) -S /dev/null - 2> {output.mapping_log}
+
+        touch {output.unmapped}
+
+        """
+# TODO
+#rule mapping_mouse_canonicalTx
+#rule mapping_mouse_longestTx
+
+
+
+rule split_fastq:
+    input:
+        unmapped = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1',
+
+    output:
+        stat_fq = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.flagstats',
+        final_BC = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.barcodes',
+
+    params:
+        demuxbyname = demuxbyname,
+        umi_data = umi_data,
+        mapping_data = mapping_data,
+        split_n = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out'
+
+    shell:
+        """
+        touch {output.stat_fq}
+        rm {output.stat_fq}
+
+        for bc in $(cut -f1 {params.umi_data}{wildcards.sample_uniq}.whitelist); do 
+            {params.demuxbyname} -Xmx20g in={input.unmapped} names=_${{bc}}_ substringmode out={params.split_n}.%.mate1 \\
+            stats={params.split_n}.${{bc}}.log 
+
+            mv {params.split_n}._${{bc}}_.mate1 {params.split_n}.${{bc}}.mate1
+            seqkit stats --tabular {params.split_n}.${{bc}}.mate1 | sed -n 2p >> {output.stat_fq}
+
+        done
+        
+        # final barcodes (with >= 1000 occurrences)
+        awk '$4 >= 1000' {output.stat_fq} | cut -f1 | awk -F'.' '{{print $(NF-1)}}' > {output.final_BC}
+        """
+
+
+
+rule RSEM_ref:
+    input:
+        genome = ref_genome,
+        GTF = ref_GTF,
+    
+    output:
+        tx = RSEM_path + ref_version + '.transcripts.fa',
+        gen = RSEM_path + 'Genome',
+
+    params:
+        rsem_data = rsem_data,
+        ref_version = ref_version,
+        RSEM_path = RSEM_path,
+
+    envmodules:
+        envmodules['STAR']
+
+    shell:
+        """
+        rsem-prepare-reference --star --num-threads 24 \\
+        --gtf {input.GTF} \\
+        {input.genome} \\
+        {params.RSEM_path}{params.ref_version}
+        """
+        
+        
+        
+rule STAR_RSEM:
+    input:
+        stat_fq = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.flagstats',
+        final_BC = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.barcodes',
+        tx = RSEM_path + ref_version + '.transcripts.fa',
+        gen = RSEM_path + 'Genome',
+
+    output:
+        STAR_echo = rsem_data + '{sample_uniq}/STAR.txt',
+
+    params:
+        umi_data = umi_data,
+        mapping_data = mapping_data,
+        rsem_data = rsem_data,
+        split_n = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out',
+        RSEM_n = rsem_data + '{sample_uniq}/',
+        ref_version = ref_version,
+        RSEM_path = RSEM_path,
+        umi_dedup = umi_dedup,
+
+    envmodules:
+        envmodules['STAR'],
+        envmodules['pipeline'],
+        envmodules['samtools'],
+        envmodules['UMI-tools'],
+
+    shell:
+        """
+        touch {output.STAR_echo}
+        rm {output.STAR_echo}
+        # --outFilterMismatchNoverLmax 0.04
+
+        # for bc in $(cut -f1 {params.umi_data}{wildcards.sample_uniq}.whitelist); do 
+        for bc in $(cat {input.final_BC}); do 
+            
+            # STAR mapping
+            STAR --genomeDir {params.RSEM_path}  \\
+            --outSAMunmapped Within  \\
+            --outFilterType BySJout  \\
+            --outSAMattributes NH HI AS NM MD  \\
+            --outFilterMultimapNmax 20  \\
+            --outFilterMismatchNmax 999  \\
+            --alignIntronMin 20  \\
+            --alignIntronMax 1000000  \\
+            --alignMatesGapMax 1000000  \\
+            --alignSJoverhangMin 8  \\
+            --alignSJDBoverhangMin 1  \\
+            --sjdbScore 1  \\
+            --runThreadN 8  \\
+            --genomeLoad NoSharedMemory  \\
+            --outSAMtype BAM Unsorted  \\
+            --quantMode TranscriptomeSAM  \\
+            --outSAMheaderHD @HD VN:1.4 SO:unsorted  \\
+            --outFileNamePrefix {params.RSEM_n}${{bc}}/mouse_genome.  \\
+            --readFilesIn {params.split_n}.${{bc}}.mate1
+
+            echo ${{bc}} >> {output.STAR_echo}
+
+            ### ### ### 
+            # samtools sort
+            samtools sort {params.RSEM_n}${{bc}}/mouse_genome.Aligned.toTranscriptome.out.bam > \\
+                {params.RSEM_n}${{bc}}/mouse_genome.Aligned.toTranscriptome.out.sorted.bam
+
+            # samtools index
+            samtools index {params.RSEM_n}${{bc}}/mouse_genome.Aligned.toTranscriptome.out.sorted.bam
+            
+        done
+        """
+
+
+
+rule DEDUP_RSEM:
+    input:
+        stat_fq = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.flagstats',
+        final_BC = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.barcodes',
+        tx = RSEM_path + ref_version + '.transcripts.fa',
+        gen = RSEM_path + 'Genome',
+        STAR_echo = rsem_data + '{sample_uniq}/STAR.txt',
+
+    output:
+        DEDUP_echo = rsem_data + '{sample_uniq}/DEDUP.txt',
+
+    params:
+        umi_data = umi_data,
+        mapping_data = mapping_data,
+        rsem_data = rsem_data,
+        split_n = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out',
+        RSEM_n = rsem_data + '{sample_uniq}/',
+        ref_version = ref_version,
+        RSEM_path = RSEM_path,
+        umi_dedup = umi_dedup,
+
+    envmodules:
+        envmodules['STAR'],
+        envmodules['pipeline'],
+        envmodules['samtools'],
+        envmodules['UMI-tools'],
+
+    shell:
+        """
+        touch {output.DEDUP_echo}
+        rm {output.DEDUP_echo}
+
+        # for bc in $(cut -f1 {params.umi_data}{wildcards.sample_uniq}.whitelist); do 
+        for bc in $(cat {input.final_BC}); do 
+
+            # umi_tools dedup
+            umi_tools dedup {params.umi_dedup} --output-stats={params.RSEM_n}${{bc}}/mouse_genome.Aligned.toTranscriptome.dedup.log \\
+                -I {params.RSEM_n}${{bc}}/mouse_genome.Aligned.toTranscriptome.out.sorted.bam \\
+                -S {params.RSEM_n}${{bc}}/mouse_genome.Aligned.toTranscriptome.dedup.bam 1> {params.RSEM_n}${{bc}}/mouse_genome.Aligned.toTranscriptome.dedup.out 2>&1
+
+            # samtools sort -n # sort by read name >> required for RSEM !!!            
+            samtools sort -n {params.RSEM_n}${{bc}}/mouse_genome.Aligned.toTranscriptome.dedup.bam > \\
+                {params.RSEM_n}${{bc}}/mouse_genome.Aligned.toTranscriptome.dedup.sortedName.bam
+
+            echo ${{bc}} >> {output.DEDUP_echo}
+            
+        done
+        """
+
+
+
+rule FORWARD_RSEM:
+    input:
+        stat_fq = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.flagstats',
+        final_BC = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.barcodes',
+        tx = RSEM_path + ref_version + '.transcripts.fa',
+        gen = RSEM_path + 'Genome',
+        STAR_echo = rsem_data + '{sample_uniq}/STAR.txt',
+        DEDUP_echo = rsem_data + '{sample_uniq}/DEDUP.txt',
+
+    output:
+        FW_echo = rsem_data + '{sample_uniq}/FORWARD.txt',
+
+    params:
+        umi_data = umi_data,
+        mapping_data = mapping_data,
+        rsem_data = rsem_data,
+        split_n = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out',
+        RSEM_n = rsem_data + '{sample_uniq}/',
+        ref_version = ref_version,
+        RSEM_path = RSEM_path,
+        umi_dedup = umi_dedup,
+
+    envmodules:
+        envmodules['STAR'],
+        envmodules['pipeline'],
+        envmodules['samtools'],
+        envmodules['UMI-tools'],
+
+    shell:
+        """
+        touch {output.FW_echo}
+        rm {output.FW_echo}
+
+        # for bc in $(cut -f1 {params.umi_data}{wildcards.sample_uniq}.whitelist); do 
+        for bc in $(cat {input.final_BC}); do 
+
+            # keep only forward reads (reads projected on transcriptome should all be on the forward strand)
+            FW_reads=$(samtools view -c -F 16 {params.RSEM_n}${{bc}}/mouse_genome.Aligned.toTranscriptome.dedup.sortedName.bam)
+            RV_reads=$(samtools view -c -f 16 {params.RSEM_n}${{bc}}/mouse_genome.Aligned.toTranscriptome.dedup.sortedName.bam)
+
+            samtools view -hb -F 16 {params.RSEM_n}${{bc}}/mouse_genome.Aligned.toTranscriptome.dedup.sortedName.bam > \\
+                {params.RSEM_n}${{bc}}/mouse_genome.Aligned.toTranscriptome.dedup.sortedNameForward.bam
+
+            echo -e "${{bc}}\t${{FW_reads}}\t${{RV_reads}}" >> {output.FW_echo}
+            
+        done
+        """
+
+
+        
+rule RSEM:
+    input:
+        stat_fq = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.flagstats',
+        final_BC = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.barcodes',
+        tx = RSEM_path + ref_version + '.transcripts.fa',
+        gen = RSEM_path + 'Genome',
+        STAR_echo = rsem_data + '{sample_uniq}/STAR.txt',
+        DEDUP_echo = rsem_data + '{sample_uniq}/DEDUP.txt',
+        FW_echo = rsem_data + '{sample_uniq}/FORWARD.txt',
+
+    output:
+        RSEM_echo = rsem_data + '{sample_uniq}/RSEM.txt',
+
+    params:
+        umi_data = umi_data,
+        mapping_data = mapping_data,
+        rsem_data = rsem_data,
+        split_n = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out',
+        RSEM_n = rsem_data + '{sample_uniq}/',
+        ref_version = ref_version,
+        RSEM_path = RSEM_path,
+        umi_dedup = umi_dedup,
+
+    envmodules:
+        envmodules['STAR'],
+        envmodules['pipeline'],
+        envmodules['samtools'],
+        envmodules['UMI-tools'],
+
+    shell:
+        """
+        touch {output.RSEM_echo}
+        rm {output.RSEM_echo}
+
+        # for bc in $(cut -f1 {params.umi_data}{wildcards.sample_uniq}.whitelist); do 
+        for bc in $(cat {input.final_BC}); do 
+            
+            # RSEM count
+            rsem-calculate-expression --num-threads 8 \\
+            --strandedness forward \\
+            --seed-length 15 \\
+            --alignments {params.RSEM_n}${{bc}}/mouse_genome.Aligned.toTranscriptome.dedup.sortedNameForward.bam \\
+            {params.RSEM_path}{params.ref_version} \\
+            {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}} 1> {params.RSEM_n}${{bc}}.log
+
+            echo ${{bc}} >> {output.RSEM_echo} 
+
+        done
+        """
+
+
+
+rule RSEM_DEPTH:
+    input:
+        stat_fq = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.flagstats',
+        final_BC = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.barcodes',
+        tx = RSEM_path + ref_version + '.transcripts.fa',
+        gen = RSEM_path + 'Genome',
+        STAR_echo = rsem_data + '{sample_uniq}/STAR.txt',
+        DEDUP_echo = rsem_data + '{sample_uniq}/DEDUP.txt',
+        FW_echo = rsem_data + '{sample_uniq}/FORWARD.txt',
+        RSEM_echo = rsem_data + '{sample_uniq}/RSEM.txt',
+
+    output:
+        DEPTH_echo = rsem_data + '{sample_uniq}/DEPTH.txt',
+
+    params:
+        umi_data = umi_data,
+        mapping_data = mapping_data,
+        rsem_data = rsem_data,
+        split_n = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out',
+        RSEM_n = rsem_data + '{sample_uniq}/',
+        ref_version = ref_version,
+        RSEM_path = RSEM_path,
+        umi_dedup = umi_dedup,
+
+    envmodules:
+        envmodules['STAR'],
+        envmodules['pipeline'],
+        envmodules['samtools'],
+        envmodules['UMI-tools'],
+        envmodules['rpfTools'],
+        envmodules['UCSC'],
+        envmodules['DeepTools'],
+        envmodules['bedtools'],
+
+    shell:
+        """
+        touch {output.DEPTH_echo}
+        rm {output.DEPTH_echo}
+
+        # for bc in $(cut -f1 {params.umi_data}{wildcards.sample_uniq}.whitelist); do 
+        for bc in $(cat {input.final_BC}); do 
+            echo {wildcards.sample_uniq}_${{bc}}
+
+            # DEPTH
+            echo 'Depth'
+            ### transcriptome
+            samtools sort {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.bam > {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam
+            samtools index {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam
+            # samtools depth {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam > {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.depth
+            
+
+            ### genome
+            samtools sort {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.bam > {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam
+            samtools index {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam
+            # samtools depth {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam > {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.depth
+            
+
+            # BIGWIG
+            echo 'BigWig'
+            ### transcriptome
+            lib_depth=$(samtools view -c -F 260 {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam)
+            echo ${{lib_depth}}
+            fractReads=1
+            curShift=0
+            chromfile={params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.chromLength.txt
+            
+            samtools view -H {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam | grep "@SQ" | awk '{{gsub("SN:","",$2); gsub("LN:","",$3); print $2"\\t"$3}}' > ${{chromfile}}
+
+            bgfile={params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.bg
+            bwfile={params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.bw
+            bgfile_norm={params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.NormByLibDepth.bg
+            bwfile_norm={params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.NormByLibDepth.bw
+            
+            # bamCoverage -p 4 -b {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam -o ${{bgfile}} --scaleFactor ${{fractReads}} -of 'bedgraph'
+            # bamCoverage -p 4 -b {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam -o ${{bwfile}} --scaleFactor ${{fractReads}} -of 'bigwig'
+
+            # bamToBedGraph -i {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam -g ${{chromfile}} -n ${{fractReads}} -s ${{curShift}} -c | LC_COLLATE=C sort -k1,1 -k2,2n > ${{bgfile}}
+            # bamToBedGraph create these ugly blocks in splice junctions !!!
+            
+            bedtools genomecov -ibam {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam -bg -split | LC_COLLATE=C sort -k1,1 -k2,2n > ${{bgfile}}
+            bedGraphToBigWig ${{bgfile}} ${{chromfile}} ${{bwfile}}
+
+            awk -v var="${{lib_depth}}" '{{ print $1 "\\t" $2 "\\t" $3 "\\t" ($4/ var) }}' ${{bgfile}} > ${{bgfile_norm}}
+            bedGraphToBigWig ${{bgfile_norm}} ${{chromfile}} ${{bwfile_norm}}
+
+            rm ${{bgfile}}
+            rm ${{bgfile_norm}}
+
+            ### genome
+            lib_depth=$(samtools view -c -F 260 {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam)
+            echo ${{lib_depth}}
+            fractReads=1
+            curShift=0
+            chromfile={params.RSEM_n}${{bc}}/mouse_genome.Aligned.chromLength.txt
+            
+            samtools view -H {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam | grep "@SQ" | awk '{{gsub("SN:","",$2); gsub("LN:","",$3); print $2"\\t"$3}}' > ${{chromfile}}
+
+            bgfile={params.RSEM_n}${{bc}}/mouse_genome.Aligned.bg
+            bwfile={params.RSEM_n}${{bc}}/mouse_genome.Aligned.bw
+            bgfile_norm={params.RSEM_n}${{bc}}/mouse_genome.Aligned.NormByLibDepth.bg
+            bwfile_norm={params.RSEM_n}${{bc}}/mouse_genome.Aligned.NormByLibDepth.bw
+
+            # bamCoverage -p 4 -b {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam -o ${{bgfile}} --scaleFactor ${{fractReads}} -of 'bedgraph'
+            # bamCoverage -p 4 -b {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam -o ${{bwfile}} --scaleFactor ${{fractReads}} -of 'bigwig'
+            
+            # bamToBedGraph -i {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam -g ${{chromfile}} -n ${{fractReads}} -s ${{curShift}} -c | LC_COLLATE=C sort -k1,1 -k2,2n > ${{bgfile}}
+            # bamToBedGraph create these ugly blocks in splice junctions !!!
+            
+            bedtools genomecov -ibam {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam -bg -split | LC_COLLATE=C sort -k1,1 -k2,2n > ${{bgfile}}
+            bedGraphToBigWig ${{bgfile}} ${{chromfile}} ${{bwfile}}
+
+            awk -v var="${{lib_depth}}" '{{ print $1 "\\t" $2 "\\t" $3 "\\t" ($4/ var) }}' ${{bgfile}} > ${{bgfile_norm}}
+            bedGraphToBigWig ${{bgfile_norm}} ${{chromfile}} ${{bwfile_norm}}
+
+            rm ${{bgfile}}
+            rm ${{bgfile_norm}}
+
+            echo ${{bc}} >> {output.DEPTH_echo} 
+
+        done
+        """
+
+
+
+rule Stats:
+    input:
+        gz = expand(raw_data + '{sample}.fastq.gz', sample=SAMPLES),
+        cat_gz = expand(raw_data + '{sample_uniq}.fastq.gz', sample_uniq = uniq_SAMPLES),
+        trimmed_log = expand(trimmed_data + '{sample_uniq}_trimming.log', sample_uniq = uniq_SAMPLES),
+        STAR_echo =  expand(rsem_data + '{sample_uniq}/STAR.txt', sample_uniq = uniq_SAMPLES),
+        DEDUP_echo =  expand(rsem_data + '{sample_uniq}/DEDUP.txt', sample_uniq = uniq_SAMPLES),
+        FW_echo =  expand(rsem_data + '{sample_uniq}/FORWARD.txt', sample_uniq = uniq_SAMPLES),
+        RSEM_echo =  expand(rsem_data + '{sample_uniq}/RSEM.txt', sample_uniq = uniq_SAMPLES),
+        DEPTH_echo =  expand(rsem_data + '{sample_uniq}/DEPTH.txt', sample_uniq = uniq_SAMPLES),
+
+    output:
+        stats = stats_data + 'Stats.txt',
+        stats_len = stats_data + 'Stats_len.txt',
+
+    params:
+        sample=SAMPLES,
+        sample_uniq=uniq_SAMPLES,
+        work_dir = work_dir,
+        raw_data = raw_data,
+        trimmed_data = trimmed_data,
+        rsem_data = rsem_data,
+        stats_data = stats_data,
+
+    shell:
+        """
+        # raw data
+        for sample in {params.sample}; do
+            echo $sample
+            stats_out={params.stats_data}${{sample}}_stats.txt
+            stats_len={params.stats_data}${{sample}}_stats_len.txt
+
+            seqkit stats --tabular --threads 10 {params.raw_data}${{sample}}.fastq.gz > {params.stats_data}stats_${{sample}}.tmp
+
+            num_seqs=$(cut -d$"\t" -f4 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
+            sum_len=$(cut -d$"\t" -f5 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
+            min_len=$(cut -d$"\t" -f6 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
+            avg_len=$(cut -d$"\t" -f7 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
+            max_len=$(cut -d$"\t" -f8 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
+
+            echo -e "${{sample}}\traw_fastq\tnum_seqs\t${{num_seqs}}" > ${{stats_out}}
+
+            echo -e "${{sample}}\traw_fastq\tsum_len\t${{sum_len}}" > ${{stats_len}}
+            echo -e "${{sample}}\traw_fastq\tmin_len\t${{min_len}}" >> ${{stats_len}}
+            echo -e "${{sample}}\traw_fastq\tavg_len\t${{avg_len}}" >> ${{stats_len}}
+            echo -e "${{sample}}\traw_fastq\tmax_len\t${{max_len}}" >> ${{stats_len}}
+
+            rm {params.stats_data}stats_${{sample}}.tmp
+        done
+
+        # concatenated raw data
+        for sample_uniq in {params.sample_uniq}; do
+            stats_out={params.stats_data}${{sample_uniq}}_stats.txt
+            stats_len={params.stats_data}${{sample_uniq}}_stats_len.txt
+
+            seqkit stats --tabular --threads 10 {params.raw_data}${{sample_uniq}}.fastq.gz > {params.stats_data}stats_${{sample_uniq}}.tmp
+
+            num_seqs=$(cut -d$"\t" -f4 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
+            sum_len=$(cut -d$"\t" -f5 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
+            min_len=$(cut -d$"\t" -f6 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
+            avg_len=$(cut -d$"\t" -f7 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
+            max_len=$(cut -d$"\t" -f8 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
+
+            echo -e "${{sample_uniq}}\traw_fastq\tnum_seqs\t${{num_seqs}}" > ${{stats_out}}
+
+            echo -e "${{sample_uniq}}\traw_fastq\tsum_len\t${{sum_len}}" > ${{stats_len}}
+            echo -e "${{sample_uniq}}\traw_fastq\tmin_len\t${{min_len}}" >> ${{stats_len}}
+            echo -e "${{sample_uniq}}\traw_fastq\tavg_len\t${{avg_len}}" >> ${{stats_len}}
+            echo -e "${{sample_uniq}}\traw_fastq\tmax_len\t${{max_len}}" >> ${{stats_len}}
+
+            rm {params.stats_data}stats_${{sample_uniq}}.tmp
+        done
+
+        # combined results
+        cat {params.stats_data}*_stats.txt > {output.stats}
+        cat {params.stats_data}*_stats_len.txt > {output.stats_len}
+
+        """
+
+
+
+rule QC:
+    input:
+        trimmed_log = expand(trimmed_data + '{sample_uniq}' + '_trimming.log', sample_uniq=uniq_SAMPLES),
+        STAR_echo = expand(rsem_data + '{sample_uniq}/STAR.txt', sample_uniq=uniq_SAMPLES),
+        DEDUP_echo = expand(rsem_data + '{sample_uniq}/DEDUP.txt', sample_uniq=uniq_SAMPLES),
+        FW_echo = expand(rsem_data + '{sample_uniq}/FORWARD.txt', sample_uniq=uniq_SAMPLES),
+        RSEM_echo = expand(rsem_data + '{sample_uniq}/RSEM.txt', sample_uniq=uniq_SAMPLES),
+        DEPTH_echo = expand(rsem_data + '{sample_uniq}/DEPTH.txt', sample_uniq=uniq_SAMPLES),
+        stats = stats_data + 'Stats.txt',
+        stats_len = stats_data + 'Stats_len.txt',
+
+    output:
+        stats_s = stats_data + '{sample_uniq}' + '_stats.txt',
+        stats_len_s = stats_data + '{sample_uniq}' + '_stats_len.txt',
+        raw_readLen_s = stats_data + '{sample_uniq}' + '_raw_readLenDist.dat',
+        trimmed_readLen_s = stats_data + '{sample_uniq}' + '_trimmed_readLenDist.dat',
+        filtered_readLen_s = stats_data + '{sample_uniq}' + '_filtered_readLenDist.dat',
+        dedup_s = stats_data + '{sample_uniq}' + '_dedup.dat',
+        RSEM_s = stats_data + '{sample_uniq}' + '_RSEM.dat',
+
+    params:
+        work_dir = work_dir,
+        trimmed_data = trimmed_data,
+        rsem_data = rsem_data,
+        stats_data = stats_data,
+
+    envmodules:
+        envmodules['rpfTools'],
+        envmodules['R'],
+
+    shell:
+        """
+        bash {params.work_dir}QC.sh {wildcards.sample_uniq} {params.work_dir}
+        """
+
+
+
+rule QC_plot:
+    input:
+        stats_s = expand(stats_data + '{sample_uniq}' + '_stats.txt', sample_uniq=uniq_SAMPLES),
+        stats_len_s = expand(stats_data + '{sample_uniq}' + '_stats_len.txt', sample_uniq=uniq_SAMPLES),
+        raw_readLen_s = expand(stats_data + '{sample_uniq}' + '_raw_readLenDist.dat', sample_uniq=uniq_SAMPLES),
+        filtered_readLen_s = expand(stats_data + '{sample_uniq}_filtered_readLenDist.dat', sample_uniq=uniq_SAMPLES),
+        dedup_s = expand(stats_data + '{sample_uniq}' + '_dedup.dat', sample_uniq=uniq_SAMPLES),
+        RSEM_s = expand(stats_data + '{sample_uniq}' + '_RSEM.dat', sample_uniq=uniq_SAMPLES),
+
+    output:
+        QC_plot = directory(stats_data + 'plots/'),
+        Preprocessing = stats_data + 'plots/' + '01_Preprocessing.pdf',
+        SequentialMapping = stats_data + 'plots/' + '02_SequentialMapping.pdf',
+        SequentialMapping_bis = stats_data + 'plots/' + '02_SequentialMapping_bis.pdf',
+        SplitBarcode = stats_data + 'plots/' + '03_SplitBarcode.pdf',
+        GenomeMapping = stats_data + 'plots/' + '04_GenomeMapping.pdf',
+        GenomeMapping_bis = stats_data + 'plots/' + '04_GenomeMapping_bis.pdf',
+        GenomeMappingSplit = stats_data + 'plots/' + '04_GenomeMappingSplitBarcode.pdf',
+        DuplicationRate = stats_data + 'plots/' + '05_DuplicationRate.pdf',
+        AllMapping = stats_data + 'plots/' + '06_AllMapping.pdf',
+        AllMapping_bis = stats_data + 'plots/' + '06_AllMapping_bis.pdf',
+        GenomeMappingTypes = stats_data + 'plots/' + '07_GenomeMappingTypes.pdf',
+        ReadLen_trimmed = stats_data + 'plots/' + '08_ReadLen_trimmed.pdf',
+        ReadLen_filtered = stats_data + 'plots/' + '09_ReadLen_filtered.pdf',
+        ReadLen_onTranscriptome = stats_data + 'plots/' + '10_ReadLen_onTranscriptome.pdf',
+        RSEM_TotalExpectedCounts = stats_data + 'plots/' + '11_RSEM_TotalExpectedCounts.pdf',
+
+    params:
+        work_dir = work_dir,
+        trimmed_data = trimmed_data,
+        rsem_data = rsem_data,
+        stats_data = stats_data,
+
+    envmodules:
+        envmodules['R'],
+
+    shell:
+        """
+        Rscript {params.work_dir}QC_plots.R {params.work_dir}
+        """
+
+
+
+### snakemake --cores 16 --use-envmodules -R all --rerun-incomplete --printshellcmds

@@ -1,0 +1,56 @@
+envmodules:
+  R: R/4.4.0
+  samtools: samtools/1.9
+  fastx_toolkit: fastx_toolkit/0.0.14
+  bowtie2: bowtie2/2.3.5
+  STAR: STAR/2.7.11b
+  cutadapt: cutadapt/3.5
+  chip-seq: chip-seq/1.5.5
+  bedtools: bedtools/2.28.0
+  UMI-tools: UMI-tools/1.0.0git
+  getLIMS: getLIMS/6.0.2
+  pipeline: pipeline/0.3.2
+  rpfTools: rpfTools/1.2.0
+  getLIMS: getLIMS/6.0.2
+  fastqc: fastqc/0.12.1
+  trimgalore: TrimGalore/0.6.10
+  UCSC: ucsc-tools/dec-10-2019
+  DeepTools: deeptools/3.5.6/
+
+
+work_dir: '/data/vricci/projects/Lisa/RNAseq_mESC_degron/'
+prefix: 'RNASeq'
+run_nb: '2770'
+
+source: 'LIMS' # LIMS or SRA
+LIMS_samples: 'LIMS_samples.links'
+SRA_samples: 'SRA_samples.txt'
+
+
+
+cutadapt: '-a CTGTCTCTTATACACATCTCCGAGCCCACGAGAC --match-read-wildcards --overlap 8 --discard-untrimmed --minimum-length 50'
+trimgalore: '--quality 24 --phred33 --length 50 --adapter CTGTCTCTTATACACATCT --fastqc'
+
+refs: [mouse_genome]
+
+STAR_refs_path: {
+  "mouse_genome": "/data/databases/mouse/star/Mmusculus.GRCm39.111/"
+}
+
+STAR_params: 
+  genome_params: &genome_params "--seedSearchStartLmax 50 --outSAMmultNmax 1 --outSAMtype BAM SortedByCoordinate Unsorted \
+    --readFilesCommand gunzip -c --limitBAMsortRAM 15000000000 --outReadsUnmapped Fastx \
+    --alignSJDBoverhangMin 1 --alignIntronMax 1000000 --outFilterType BySJout --alignSJoverhangMin 8 \
+    --sjdbGTFfile /data/databases/mouse/gtf/Mmusculus.GRCm39.111.sorted.gtf"
+
+STAR_refs_params: {
+  "mouse_genome": *genome_params
+}
+
+
+# RSEM
+ref_version: 'Mmusculus.GRCm39.111'
+ref_path: '/data/databases/mouse/'
+ref_genome: '/data/databases/mouse/fasta/Mmusculus.GRCm39.111.dna.ensembl.fa'
+ref_GTF: '/data/databases/mouse/gtf/Mmusculus.GRCm39.111.sorted.gtf'
+RSEM_path: '/data/databases/RSEM/Mmusculus.GRCm39.111/'
