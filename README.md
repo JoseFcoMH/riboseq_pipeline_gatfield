@@ -25,7 +25,7 @@
 - Plot QC figures
 
 **Pipeline overview for human data:**
-Same step as for mouse data, except the mapping.
+-> Same step as for mouse data, except the mapping.
 - Sequential mapping using STAR
     1) human rRNA
     2) human tRNA
