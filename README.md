@@ -10,7 +10,7 @@ If you need any help, please contact virginie.ricci@unil.ch.
 - [demuxbyname.sh](https://github.com/bbushnell/BBTools/blob/master/demuxbyname.sh) # in my case: accessed using full path to the command
 - [consume.py](https://github.com/gatfieldlab/pipeline/tree/master/gatlab/pipeline/consume.py) # in my case: accessed via the module 'pipeline'
 - [seqtk](https://github.com/lh3/seqtk) # in my case: accessed using full path to the command
-- Modify the software versions in config.yaml according to your conda environment
+- Modify the software versions in `config.yaml` according to your conda environment
 
 
 # Ribo-seq Snakemake pipeline
