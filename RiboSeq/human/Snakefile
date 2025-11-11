@@ -15,7 +15,7 @@ def SRA_samples(df_f):
 
 def getLIMS_samples(df_f, prefix, run_nb):
     df = pd.read_csv(df_f, sep='\t', header=None)
-    tmp = pd.DataFrame(df[0].str.replace('https://api-uhts-lgtf.unil.ch/symlink/', '').str.split('_', expand=True))
+    tmp = pd.DataFrame(df[0].str.split('/', expand=True)[ncol].str.split('_', expand=True))
     tmp[1] = tmp[1].str.replace('L', '')
     df[1] = tmp[0] + '_' + run_nb + '_' + tmp[1] + '_' + tmp[3] + '_' + tmp[2]
     df[2] = df[1] + '.fastq.gz'
