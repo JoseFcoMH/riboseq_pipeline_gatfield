@@ -23,7 +23,7 @@ prefix: 'RNASeq'
 run_nb: '2770'
 
 source: 'LIMS' # LIMS or SRA
-LIMS_samples: 'samples.links'
+LIMS_samples: 'LIMS_samples.links'
 SRA_samples: 'SRA_samples.txt'
 
 
