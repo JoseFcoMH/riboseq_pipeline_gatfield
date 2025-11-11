@@ -1,8 +1,6 @@
+In the lab of David Gatfield, we developped two distinct pipelines that process and map Ribo-seq and RNA-seq data. The Ribo-seq pipeline was based on the previous pipeline [`pipeline`](https://github.com/gatfieldlab/pipeline). If you need any help, please contact virginie
+
 # Ribo-seq Snakemake pipeline
-In the lab of David Gatfield, we developped two pipelines that process Ribo-seq and RNA-seq data. The Ribo-seq pipeline was based on the previous pipeline [`pipeline`](https://github.com/gatfieldlab/pipeline). 
-
-
-
 ## Pipeline overview for mouse data:
 - Download sequencing data (if needed)
     - You need to manually create a file called "samples.links" containing the links to download the Ribo-seq data.
