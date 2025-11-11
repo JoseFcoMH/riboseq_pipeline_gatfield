@@ -2,7 +2,7 @@ In the lab of David Gatfield, we developped pipelines to process and map Ribo-se
 
 If you need any help, please contact virginie.ricci@unil.ch.
 
-For example, copy all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your project directory, activate your snakemake conda environment and run `snakemake --cores n`.
+For example, copy all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your project directory, activate your Snakemake [`conda`](https://conda.io/docs/) environment and run `snakemake --cores n`.
 
 # Ribo-seq Snakemake pipeline
 ## Pipeline overview for mouse data:
