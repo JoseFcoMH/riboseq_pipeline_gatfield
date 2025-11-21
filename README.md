@@ -19,6 +19,8 @@ Then, you can create and activate your [`Snakemake`](https://anaconda.org/biocon
 
 `conda activate myenv`
 
+`export PATH=$PATH:Snakemake_pipeline` to make demuxbyname.sh and consume.py executable from everywhere
+
 and run:
 
 `snakemake --cores n`
@@ -26,10 +28,16 @@ and run:
 If you need any help, please contact virginie.ricci@unil.ch.
 
 ##  Prerequisites:
-- [demuxbyname.sh](https://github.com/bbushnell/BBTools/blob/master/demuxbyname.sh) # in my case: accessed using full path to the command (path specified in config.yaml)
-- [consume.py](https://github.com/gatfieldlab/pipeline/tree/master/gatlab/pipeline/consume.py) # in my case: accessed via the module 'pipeline'
-- [seqtk](https://github.com/lh3/seqtk) # in my case: accessed using full path to the command (path specified in config.yaml)
-- or `export PATH=$PATH:Snakemake_pipeline` to make the demuxbyname.sh and consume.py executable from everywhere`
+- [demuxbyname.sh](https://github.com/bbushnell/BBTools/blob/master/demuxbyname.sh)
+- [consume.py](https://github.com/gatfieldlab/pipeline/tree/master/gatlab/pipeline/consume.py)
+- [samtools](https://www.htslib.org/)
+- [STAR](https://github.com/alexdobin/STAR)
+- [cutadapt](https://cutadapt.readthedocs.io/en/stable/)
+- [bedtools](https://bedtools.readthedocs.io/en/latest/)
+- [UMI-tools](https://github.com/CGATOxford/UMI-tools)
+- [fastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
+- [Trim Galore](https://github.com/FelixKrueger/TrimGalore)
+- [seqtk](https://github.com/lh3/seqtk)
 - Modify the software versions in `config.yaml` according to your conda environment
 - Edit `config.yaml` according to your dataset and reference files
 
