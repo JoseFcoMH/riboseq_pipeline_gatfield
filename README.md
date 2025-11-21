@@ -7,9 +7,9 @@ Currently, you can use the pipeline by copying all files present in [`RiboSeq/mo
 If you need any help, please contact virginie.ricci@unil.ch.
 
 ##  Prerequisites:
-- [demuxbyname.sh](https://github.com/bbushnell/BBTools/blob/master/demuxbyname.sh) # in my case: accessed using full path to the command
+- [demuxbyname.sh](https://github.com/bbushnell/BBTools/blob/master/demuxbyname.sh) # in my case: accessed using full path to the command (path specified in config.yaml)
 - [consume.py](https://github.com/gatfieldlab/pipeline/tree/master/gatlab/pipeline/consume.py) # in my case: accessed via the module 'pipeline'
-- [seqtk](https://github.com/lh3/seqtk) # in my case: accessed using full path to the command
+- [seqtk](https://github.com/lh3/seqtk) # in my case: accessed using full path to the command (path specified in config.yaml)
 - Modify the software versions in `config.yaml` according to your conda environment
 
 
