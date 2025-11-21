@@ -15,6 +15,7 @@ def SRA_samples(df_f):
 
 def getLIMS_samples(df_f, prefix, run_nb):
     df = pd.read_csv(df_f, sep='\t', header=None)
+    ncol = df[0].str.split('/', expand=True).shape[1]-1
     tmp = pd.DataFrame(df[0].str.split('/', expand=True)[ncol].str.split('_', expand=True))
     tmp[1] = tmp[1].str.replace('L', '')
     df[1] = tmp[0] + '_' + run_nb + '_' + tmp[1] + '_' + tmp[3] + '_' + tmp[2]
@@ -394,7 +395,7 @@ rule preprocess:
     shell:
         """
         umi_tools extract -I {input.trimmed_gz} --whitelist {input.whitelist} {params.umi_extract} 2> {output.extr_log} | \\
-        consume {params.ribo} 2> {output.size_log} | \\
+        consume.py {params.ribo} 2> {output.size_log} | \\
         fastq_quality_filter {params.fastx_toolkit} 2> {output.qual_log} 1> {params.clean_fastq}
         
         seqtk trimfq -b 2 {params.clean_fastq} > {params.final_fastq}
@@ -594,7 +595,7 @@ rule split_fastq:
         rm {output.stat_fq}
 
         for bc in $(cut -f1 {params.umi_data}{wildcards.sample_uniq}.whitelist); do 
-            demuxbyname -Xmx20g in={input.unmapped} names=_${{bc}}_ substringmode out={params.split_n}.%.mate1 \\
+            demuxbyname.sh -Xmx20g in={input.unmapped} names=_${{bc}}_ substringmode out={params.split_n}.%.mate1 \\
             stats={params.split_n}.${{bc}}.log 
 
             mv {params.split_n}._${{bc}}_.mate1 {params.split_n}.${{bc}}.mate1
