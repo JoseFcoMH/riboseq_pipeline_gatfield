@@ -27,7 +27,6 @@ LIMS_samples: 'LIMS_samples.links'
 SRA_samples: 'SRA_samples.txt'
 
 
-
 cutadapt: '-a CTGTCTCTTATACACATCTCCGAGCCCACGAGAC --match-read-wildcards --overlap 8 --discard-untrimmed --minimum-length 50'
 trimgalore: '--quality 24 --phred33 --length 50 --adapter CTGTCTCTTATACACATCT --fastqc'
 

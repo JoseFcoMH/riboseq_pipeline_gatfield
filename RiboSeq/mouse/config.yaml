@@ -18,8 +18,8 @@ envmodules:
   DeepTools: deeptools/3.5.6/
 
 
-seqtk: '/data/vricci/tools/seqtk/seqtk'
-demuxbyname: '/home/vricci/miniconda3/bin/demuxbyname.sh'
+# seqtk: '/data/vricci/tools/seqtk/seqtk'
+# demuxbyname: '/home/vricci/miniconda3/bin/demuxbyname.sh'
 
 work_dir: '/data/vricci/projects/Sebastien/GCN2/'
 prefix: 'NovaSeq'
@@ -28,7 +28,6 @@ run_nb: '260'
 source: '' # LIMS, SRA or '' (if already downloaded >> raw_data/*.fastq.gz)
 LIMS_samples: 'LIMS_samples.links'
 SRA_samples: 'SRA_samples.txt'
-
 
 
 # Default >> for LIMS
@@ -45,10 +44,10 @@ consume: {
 fastx_toolkit: '-Q33 -q 24 -p 90 -v'
 
 
-# Reads mapping to the following references in that order:
+# Reads mapping to the following references in that order:
 refs: [mouse_rRNA, human_rRNA, mouse_tRNA, mouse_cDNA, mouse_genome]
 
-# STAR
+# STAR
 STAR_refs_path: {
   "mouse_rRNA": "/data/databases/mouse/star/Mmusculus.GRCm39.111/all_rRNA_PreRibo/",
   "human_rRNA": "/data/databases/human/star/Hsapiens.GRCh38.111/all_tRNA/",
@@ -70,9 +69,9 @@ STAR_params:
     --alignSJDBoverhangMin 1 --alignIntronMax 1000000 --outFilterType BySJout --alignSJoverhangMin 8 \
     --sjdbGTFfile /data/databases/mouse/gtf/Mmusculus.GRCm39.111.sorted.gtf"
 
-# currently: STAR mapping to mouse_rRNA, human_rRNA, mouse_tRNA,
+# currently: STAR mapping to mouse_rRNA, human_rRNA, mouse_tRNA,
 # mouse_cDNA after mouse_tRNA (results in mapping_data/)
-# mouse_genome after mouse_tRNA (results in mapping_data/)
+# mouse_genome after mouse_tRNA (results in mapping_data/)
 # mouse_genome after mouse_tRNA WITH SPECIFIC RSEM PARAMETERS (results in RSEM/STAR/)
 STAR_refs_params: {
   "mouse_rRNA": *basic_params,
