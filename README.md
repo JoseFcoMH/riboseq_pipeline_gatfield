@@ -19,7 +19,7 @@ Then, you can create and activate your [`Snakemake`](https://anaconda.org/biocon
 
 `conda activate myenv`
 
-`export PATH=$PATH:Snakemake_pipeline` to make demuxbyname.sh and consume.py executable from everywhere
+`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` to make demuxbyname.sh and consume.py executable from everywhere
 
 and run:
 
