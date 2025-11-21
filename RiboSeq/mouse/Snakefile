@@ -56,10 +56,7 @@ trimgalore = config['trimgalore']
 umi_whitelist = config['umi_whitelist']
 umi_extract = config['umi_extract']
 umi_dedup = config['umi_dedup']
-consume = config['consume']
 fastx_toolkit = config['fastx_toolkit']
-seqtk = config['seqtk']
-demuxbyname = config['demuxbyname']
 
 work_dir = config['work_dir']
 script = work_dir + 'scripts/'
@@ -384,9 +381,7 @@ rule preprocess:
     params:
         umi_whitelist = umi_whitelist,
         umi_extract = umi_extract,
-        consume = consume,
         fastx_toolkit = fastx_toolkit,
-        seqtk = seqtk,
         ribo = lambda wildcards: SAMPLES_RANGE[wildcards.sample_uniq],
         clean_fastq = filtered_data + '{sample_uniq}_clean.fastq',
         final_fastq = filtered_data + '{sample_uniq}_final.fastq',
@@ -403,7 +398,7 @@ rule preprocess:
         consume {params.ribo} 2> {output.size_log} | \\
         fastq_quality_filter {params.fastx_toolkit} 2> {output.qual_log} 1> {params.clean_fastq}
         
-        {params.seqtk} trimfq -b 2 {params.clean_fastq} > {params.final_fastq}
+        seqtk trimfq -b 2 {params.clean_fastq} > {params.final_fastq}
         gzip -f {params.clean_fastq} 1> {output.clean_fastq_gz}
         gzip -f {params.final_fastq} 1> {output.final_fastq_gz}
         """
@@ -625,7 +620,6 @@ rule split_fastq:
         final_BC = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1.split.barcodes',
 
     params:
-        demuxbyname = demuxbyname,
         umi_data = umi_data,
         mapping_data = mapping_data,
         split_n = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out'
@@ -636,7 +630,7 @@ rule split_fastq:
         rm {output.stat_fq}
 
         for bc in $(cut -f1 {params.umi_data}{wildcards.sample_uniq}.whitelist); do 
-            {params.demuxbyname} -Xmx20g in={input.unmapped} names=_${{bc}}_ substringmode out={params.split_n}.%.mate1 \\
+            demuxbyname -Xmx20g in={input.unmapped} names=_${{bc}}_ substringmode out={params.split_n}.%.mate1 \\
             stats={params.split_n}.${{bc}}.log 
 
             mv {params.split_n}._${{bc}}_.mate1 {params.split_n}.${{bc}}.mate1
