@@ -19,7 +19,7 @@ Then, you can create and activate your [`Snakemake`](https://anaconda.org/biocon
 
 `conda activate myenv`
 
-`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` to make demuxbyname.sh and consume.py executable from everywhere
+`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` to make demuxbyname.sh executable from everywhere
 
 and run:
 
@@ -29,7 +29,6 @@ If you need any help, please contact virginie.ricci@unil.ch.
 
 ##  Prerequisites:
 - [demuxbyname.sh](https://github.com/bbushnell/BBTools/blob/master/demuxbyname.sh)
-- [consume.py](https://github.com/gatfieldlab/pipeline/tree/master/gatlab/pipeline/consume.py)
 - [samtools](https://www.htslib.org/)
 - [STAR](https://github.com/alexdobin/STAR)
 - [cutadapt](https://cutadapt.readthedocs.io/en/stable/)
