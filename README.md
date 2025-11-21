@@ -1,4 +1,18 @@
-In the lab of David Gatfield, we developped pipelines to process and map Ribo-seq and RNA-seq data. The Ribo-seq pipeline was based on the previous pipeline [`pipeline`](https://github.com/gatfieldlab/pipeline) [(Arpat et al. 2020)](https://pubmed.ncbi.nlm.nih.gov/32703885/). If you need any help, please contact virginie.ricci@unil.ch.
+In the lab of David Gatfield, we developped pipelines to process and map Ribo-seq and RNA-seq data. The Ribo-seq pipeline was based on the previous [`pipeline`](https://github.com/gatfieldlab/pipeline) [(Arpat et al. 2020)](https://pubmed.ncbi.nlm.nih.gov/32703885/). 
+
+The pipeline includes a Snakefile, a config.yaml, software commands, and R and Python scripts. 
+
+Currently, you can use the pipeline by copying all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your project directory. Then, activate your [`Snakemake`](https://anaconda.org/bioconda/snakemake) [`conda`](https://conda.io/docs/) environment and run `snakemake --cores n`.
+
+If you need any help, please contact virginie.ricci@unil.ch.
+
+##  Prerequisites:
+- [demuxbyname.sh](https://github.com/bbushnell/BBTools/blob/master/demuxbyname.sh) # in my case: accessed using full path to the command (path specified in config.yaml)
+- [consume.py](https://github.com/gatfieldlab/pipeline/tree/master/gatlab/pipeline/consume.py) # in my case: accessed via the module 'pipeline'
+- [seqtk](https://github.com/lh3/seqtk) # in my case: accessed using full path to the command (path specified in config.yaml)
+- Modify the software versions in `config.yaml` according to your conda environment
+- Edit `config.yaml` according to your dataset
+
 
 # Ribo-seq Snakemake pipeline
 ## Pipeline overview for mouse data:
