@@ -11,6 +11,7 @@ If you need any help, please contact virginie.ricci@unil.ch.
 - [consume.py](https://github.com/gatfieldlab/pipeline/tree/master/gatlab/pipeline/consume.py) # in my case: accessed via the module 'pipeline'
 - [seqtk](https://github.com/lh3/seqtk) # in my case: accessed using full path to the command (path specified in config.yaml)
 - Modify the software versions in `config.yaml` according to your conda environment
+- Edit `config.yaml` according to your dataset
 
 
 # Ribo-seq Snakemake pipeline
