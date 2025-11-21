@@ -9,7 +9,7 @@ You can use the pipeline by cloning the repository:
 
 and copying all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your project directory:
 
-`cp RiboSeq/mouse /path/to/your/project`
+`cp -r Snakemake_pipeline/RiboSeq/mouse /path/to/your/project`
 
 Then, you can activate your [`Snakemake`](https://anaconda.org/bioconda/snakemake) [`conda`](https://conda.io/docs/) environment:
 
