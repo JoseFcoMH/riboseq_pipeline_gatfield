@@ -18,7 +18,7 @@ envmodules:
   DeepTools: deeptools/3.5.6/
 
 
-work_dir: '/data/vricci/projects/Lisa/RNAseq_mESC_degron/'
+work_dir: '/path/to/your/project/' # don't forget the last '/'
 prefix: 'RNASeq'
 run_nb: '2770'
 

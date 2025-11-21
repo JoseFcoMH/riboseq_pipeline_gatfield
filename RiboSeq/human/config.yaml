@@ -18,10 +18,8 @@ envmodules:
   DeepTools: deeptools/3.5.6/
 
 
-# seqtk: '/data/vricci/tools/seqtk/seqtk'
-# demuxbyname: '/home/vricci/miniconda3/bin/demuxbyname.sh'
 
-work_dir: '/data/vricci/projects/Sebastien/GCN2/'
+work_dir: '/path/to/your/project/' # don't forget the last '/'
 prefix: 'NovaSeq'
 run_nb: '260'
 
