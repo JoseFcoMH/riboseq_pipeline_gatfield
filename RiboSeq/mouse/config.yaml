@@ -51,8 +51,6 @@ STAR_refs_path: {
   "human_rRNA": "/data/databases/human/star/Hsapiens.GRCh38.111/all_tRNA/",
   "mouse_tRNA": "/data/databases/mouse/star/Mmusculus.GRCm39.111/all_tRNA/",
   "mouse_cDNA": "/data/databases/mouse/star/Mmusculus.GRCm39.111/cDNA/",
-  "mouse_canonicalTx": "/data/databases/mouse/star/Mmusculus.GRCm39.111/selected_cDNA/",
-  "mouse_longestTx": "",
   "mouse_genome": "/data/databases/mouse/star/Mmusculus.GRCm39.111/"
 }
 
@@ -76,8 +74,6 @@ STAR_refs_params: {
   "human_rRNA": *basic_params,
   "mouse_tRNA": *basic_params,
   "mouse_cDNA": *basic_params,
-  "mouse_canonicalTx": *basic_params,
-  "mouse_longestTx": *basic_params,
   "mouse_genome": *genome_params
 }
 
