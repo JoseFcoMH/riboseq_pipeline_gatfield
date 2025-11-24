@@ -57,7 +57,7 @@ If you need any help, please contact virginie.ricci@unil.ch.
     2) human rRNA
     3) mouse tRNA
     4) mouse cDNA
-- Split mouse tRNA unmapped reads (.fastq) per barcode
+- Split mouse tRNA unmapped reads (.fastq) by barcode
 - Prepare RSEM reference (rsem-prepare-reference) for mouse genome
 - Perform mouse genome mapping using STAR with RSEM parameters (mapping on genome and projection on transcriptome)
 - Perform "UMI-tools dedup" on transcriptome-projected .bam
