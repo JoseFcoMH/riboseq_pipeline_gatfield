@@ -76,11 +76,6 @@ if source == 'LIMS':
     nb_LIMS = len(LIMS_link)
     LIMS = getLIMS_samples(LIMS_f, prefix, run_nb)[1]
 
-    # correct IDs
-    # LIMS = LIMS.replace({'25Ddt3d': '25Ddt4h'}, regex=True)
-    # LIMS = LIMS.replace({'26Ddt3d': '26Ddt4h'}, regex=True)
-    # LIMS = LIMS.replace({'27Ddt3d': '27Ddt4h'}, regex=True)
-
     LIMS.to_csv(prefix + '_samples.db', sep='\t', index=False, header=False)
 
     shell('mkdir -p ' + raw_data)
@@ -108,7 +103,7 @@ if source == 'LIMS':
 
 
 ######
-## SRA
+## SRA # not tested
 ######
 elif source == 'SRA':
 
@@ -194,16 +189,13 @@ rule all:
         expand(rsem_data + '{sample_uniq}/mouse_genome.Aligned.bw', sample_uniq=uniq_SAMPLES),
         expand(rsem_data + '{sample_uniq}/mouse_genome.Aligned.NormByLibDepth.bg', sample_uniq=uniq_SAMPLES),
         expand(rsem_data + '{sample_uniq}/mouse_genome.Aligned.NormByLibDepth.bw', sample_uniq=uniq_SAMPLES),
-        # rsem_data + 'RSEM_plot.log',
         expand(stats_data + '{sample_uniq}_stats.dat', sample_uniq=uniq_SAMPLES),
-        #stats_data + 'QC_plot.log',
         stats_data + 'plots/01_Stats.pdf',
         stats_data + 'plots/02_GenomeMapping.pdf',
         stats_data + 'plots/02_GenomeMapping_bis.pdf',
         stats_data + 'plots/03_GenomeMappingTypes.pdf', 
         stats_data + 'plots/04_ReadLen_trimmed.pdf', 
         stats_data + 'plots/05_ReadLen_onTranscriptome.pdf', 
-        #expand(mapping_data + 'STAR/{sample_uniq}/mouse_cDNA.Aligned.sortedByCoord.out.bam', sample_uniq=uniq_SAMPLES),
 
 
 
@@ -481,30 +473,6 @@ rule RSEM_DEPTH:
 
 
 
-# rule RSEM_plot:
-#     input:
-#         RSEM_count = expand(rsem_data + '{sample_uniq}/mouse_genome.genes.results', sample_uniq=uniq_SAMPLES),
-#         RSEM_iso_count = expand(rsem_data + '{sample_uniq}/mouse_genome.isoforms.results', sample_uniq=uniq_SAMPLES),
-
-#     output:
-#         RSEM_log = rsem_data + 'RSEM_plot.log',
-
-#     params:
-#         ref_path = ref_path,
-#         ref_version = ref_version,
-#         rsem_data = rsem_data,
-
-#     envmodules:
-#         envmodules['R'],
-
-#     shell:
-#         """
-#         Rscript RSEM_plot.R {params.ref_version} {params.ref_path} {params.rsem_data} 2>&1 | tee {output.RSEM_log}
-#         Rscript RSEM_plot_ProteinCoding.R {params.ref_version} {params.ref_path} {params.rsem_data} 2>&1 | tee {output.RSEM_log}
-#         """
-
-
-
 rule Stats:
     input:
         gz = expand(raw_data + '{sample}.fastq.gz', sample=SAMPLES),
@@ -588,7 +556,6 @@ rule Stats:
 
 rule QC:
     input:
-        # RSEM_log = rsem_data + 'RSEM_plot.log',
         stats = stats_data + 'Stats.txt',
         stats_len = stats_data + 'Stats_len.txt',
         trimmed_log = trimmed_data + '{sample_uniq}' + '_trimming.log',
@@ -649,60 +616,6 @@ rule QC_plot:
         """
         Rscript {params.work_dir}QC_plots.R {params.work_dir}
         """
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-# OLD METHOD
-# rule mapping_genome:
-#     input:
-#         trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fq.gz',
-
-#     output:
-#         mapping_log = mapping_data + 'STAR/log/{sample_uniq}.mouse_cDNA.err',
-#         unmapped = mapping_data + 'STAR/{sample_uniq}/mouse_cDNA.Unmapped.out.mate1',
-#         mapped = mapping_data + 'STAR/{sample_uniq}/mouse_cDNA.Aligned.sortedByCoord.out.bam',
-
-#     params:
-#         mapping_data = mapping_data,
-#         ref_path = STAR_refs_path['mouse_genome'],
-#         ref_params = STAR_refs_params['mouse_genome'],
-
-
-#     envmodules:
-#         envmodules['STAR']
-
-#     shell:
-#         """
-#         STAR --runThreadN 12 --twopassMode Basic \\
-#             --genomeDir {params.ref_path} \\
-#             --readFilesIn {input.trimmed_gz} \\
-#             --readFilesCommand gunzip-c \\
-#             --outFileNamePrefix {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_genome. \\
-#             --outTmpDir {params.mapping_data}/STAR/{wildcards.sample_uniq}/mouse_genome \\
-#             >(tee /dev/null) -S /dev/null - {params.ref_params} 2> {output.mapping_log}
-#         """
-
-
-
-
-
-
-
-
-
-
-
 
 
 
