@@ -608,9 +608,6 @@ rule mapping_mouse_genome:
         touch {output.unmapped}
 
         """
-# TODO
-#rule mapping_mouse_canonicalTx
-#rule mapping_mouse_longestTx
 
 
 
