@@ -89,7 +89,6 @@ if source == 'LIMS':
     shell('cut -f4 ' + prefix + '_samples.db' + ' | uniq > ' + raw_data + prefix + '_data.txt')
     shell('cut -d"_" -f1 ' + raw_data + prefix + '_data.txt' + ' | sort | uniq > ' + raw_data + prefix + '_data_uniq.txt')
 
-    # TODO
     command_LIMS = expand('wget {link_i} -O ' + raw_data + '{lims}', zip, link_i=LIMS_link, lims=LIMS[5])
 
     ##############################
@@ -109,12 +108,8 @@ if source == 'LIMS':
     else:
         print('The file "LIMS_samples" was not found.')
 
-    # TODO
-    #shell('seqkit head -n 1000 raw_data/PF72_2611_1_001_R1.fastq.gz > raw_data/PF72_SUB.fastq')
-    #shell('gzip raw_data/PF72_SUB.fastq')
-
 ######
-## SRA
+## SRA # not tested
 ######
 elif source == 'SRA':
 
@@ -170,9 +165,7 @@ else:
     print('The parameter "source" should be either "LIMS", "SRA" or "".')
 
 
-# TODO
-# SAMPLES_GZ = [os.path.basename(x) for x in glob.glob('raw_data/P*.gz')]
-# SAMPLES = [f.replace('.fastq.gz', '') for f in SAMPLES_GZ]
+
 SAMPLES = sorted(list(set(LIMS[4])))
 print('Samples')
 print(SAMPLES) # ['PF72_2611_2_001_R1', 'PF73_2611_1_001_R1', 'PF72_2611_1_001_R1', 'PF73_2611_2_001_R1']
@@ -181,7 +174,6 @@ print(uniq_SAMPLES) # PF72, PF73, ...
 SAMPLES_TYPE = dict() # monosome, disome, ...
 SAMPLES_RANGE = dict() # 28 37, 45 70, ... 
 # consume = {"PF":"28 37", "PD":"45 70", "PT":"23 62", "P3":"75 100"}
-# for f in SAMPLES:
 for f in uniq_SAMPLES:
     ribotype=f[:2]
     SAMPLES_TYPE[f] = ribotype
@@ -285,31 +277,6 @@ rule raw_fastqc:
         """
 
 
-# rule trimming:
-#     input:
-#         gz = raw_data + '{sample_uniq}.fastq.gz',
-#         fastqc = raw_data + '{sample_uniq}_fastqc.html',
-
-#     output:
-#         trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fastq.gz',
-#         trimmed_log = trimmed_data + '{sample_uniq}_trimming.log',
-
-#     params:
-#         cutadapt = cutadapt,
-#         umi_whitelist = umi_whitelist,
-
-#     envmodules:
-#         envmodules['cutadapt'],
-#         envmodules['UMI-tools'],
-
-#     shell:
-#         """
-#         gzip -dc {input.gz} | \\
-#         cutadapt --cores=0 {params.cutadapt} - 2> {output.trimmed_log} | \\
-#         gzip 1> {output.trimmed_gz}
-#         """
-
-
 
 rule trim_galore:
     input:
@@ -318,7 +285,6 @@ rule trim_galore:
 
     output:
         trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fq.gz',
-        # trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fastq.gz',
         trimmed_log = trimmed_data + '{sample_uniq}_trimming.log',
 
     params:
@@ -342,7 +308,6 @@ rule barcode_whitelist:
         fastqc = raw_data + '{sample_uniq}_fastqc.html',
 
         trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fq.gz',
-        # trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fastq.gz',
     
     output:
         whitelist = umi_data + '{sample_uniq}.whitelist',
@@ -366,7 +331,6 @@ rule preprocess:
         gz = raw_data + '{sample_uniq}.fastq.gz',
 
         trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fq.gz',
-        # trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fastq.gz',
         
         whitelist = umi_data + '{sample_uniq}.whitelist',
     
@@ -703,7 +667,6 @@ rule STAR_RSEM:
         rm {output.STAR_echo}
         # --outFilterMismatchNoverLmax 0.04
 
-        # for bc in $(cut -f1 {params.umi_data}{wildcards.sample_uniq}.whitelist); do 
         for bc in $(cat {input.final_BC}); do 
             
             # STAR mapping
@@ -774,7 +737,6 @@ rule DEDUP_RSEM:
         touch {output.DEDUP_echo}
         rm {output.DEDUP_echo}
 
-        # for bc in $(cut -f1 {params.umi_data}{wildcards.sample_uniq}.whitelist); do 
         for bc in $(cat {input.final_BC}); do 
 
             # umi_tools dedup
@@ -826,7 +788,6 @@ rule FORWARD_RSEM:
         touch {output.FW_echo}
         rm {output.FW_echo}
 
-        # for bc in $(cut -f1 {params.umi_data}{wildcards.sample_uniq}.whitelist); do 
         for bc in $(cat {input.final_BC}); do 
 
             # keep only forward reads (reads projected on transcriptome should all be on the forward strand)
@@ -877,7 +838,6 @@ rule RSEM:
         touch {output.RSEM_echo}
         rm {output.RSEM_echo}
 
-        # for bc in $(cut -f1 {params.umi_data}{wildcards.sample_uniq}.whitelist); do 
         for bc in $(cat {input.final_BC}); do 
             
             # RSEM count
@@ -934,7 +894,6 @@ rule RSEM_DEPTH:
         touch {output.DEPTH_echo}
         rm {output.DEPTH_echo}
 
-        # for bc in $(cut -f1 {params.umi_data}{wildcards.sample_uniq}.whitelist); do 
         for bc in $(cat {input.final_BC}); do 
             echo {wildcards.sample_uniq}_${{bc}}
 
@@ -943,13 +902,11 @@ rule RSEM_DEPTH:
             ### transcriptome
             samtools sort {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.bam > {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam
             samtools index {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam
-            # samtools depth {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam > {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.depth
             
 
             ### genome
             samtools sort {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.bam > {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam
             samtools index {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam
-            # samtools depth {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam > {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.depth
             
 
             # BIGWIG
@@ -968,11 +925,6 @@ rule RSEM_DEPTH:
             bgfile_norm={params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.NormByLibDepth.bg
             bwfile_norm={params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.NormByLibDepth.bw
             
-            # bamCoverage -p 4 -b {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam -o ${{bgfile}} --scaleFactor ${{fractReads}} -of 'bedgraph'
-            # bamCoverage -p 4 -b {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam -o ${{bwfile}} --scaleFactor ${{fractReads}} -of 'bigwig'
-
-            # bamToBedGraph -i {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam -g ${{chromfile}} -n ${{fractReads}} -s ${{curShift}} -c | LC_COLLATE=C sort -k1,1 -k2,2n > ${{bgfile}}
-            # bamToBedGraph create these ugly blocks in splice junctions !!!
             
             bedtools genomecov -ibam {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.transcript.sorted.bam -bg -split | LC_COLLATE=C sort -k1,1 -k2,2n > ${{bgfile}}
             bedGraphToBigWig ${{bgfile}} ${{chromfile}} ${{bwfile}}
@@ -997,12 +949,7 @@ rule RSEM_DEPTH:
             bgfile_norm={params.RSEM_n}${{bc}}/mouse_genome.Aligned.NormByLibDepth.bg
             bwfile_norm={params.RSEM_n}${{bc}}/mouse_genome.Aligned.NormByLibDepth.bw
 
-            # bamCoverage -p 4 -b {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam -o ${{bgfile}} --scaleFactor ${{fractReads}} -of 'bedgraph'
-            # bamCoverage -p 4 -b {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam -o ${{bwfile}} --scaleFactor ${{fractReads}} -of 'bigwig'
-            
-            # bamToBedGraph -i {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam -g ${{chromfile}} -n ${{fractReads}} -s ${{curShift}} -c | LC_COLLATE=C sort -k1,1 -k2,2n > ${{bgfile}}
-            # bamToBedGraph create these ugly blocks in splice junctions !!!
-            
+
             bedtools genomecov -ibam {params.RSEM_n}${{bc}}/mouse_genome.Aligned.out.sorted.bam -bg -split | LC_COLLATE=C sort -k1,1 -k2,2n > ${{bgfile}}
             bedGraphToBigWig ${{bgfile}} ${{chromfile}} ${{bwfile}}
 
