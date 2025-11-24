@@ -9,7 +9,7 @@ You can use the pipeline by cloning the repository:
 
 and copying all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your project directory:
 
-`cp -r Snakemake_pipeline/RiboSeq/mouse/ /path/to/your/project`
+`cp Snakemake_pipeline/RiboSeq/mouse/* /path/to/your/project`
 
 **Check the prequisites and edit the config.yaml**
 
@@ -19,7 +19,7 @@ Then, you can create and activate your [`Snakemake`](https://anaconda.org/biocon
 
 `conda activate myenv`
 
-`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` to make demuxbyname.sh executable from everywhere
+`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # to make demuxbyname.sh executable from everywhere
 
 and run:
 
