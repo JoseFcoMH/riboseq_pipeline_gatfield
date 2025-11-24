@@ -18,6 +18,7 @@ def getLIMS_samples(df_f, prefix, run_nb):
     ncol = df[0].str.split('/', expand=True).shape[1]-1
     tmp = pd.DataFrame(df[0].str.split('/', expand=True)[ncol].str.split('_', expand=True))
     tmp[1] = tmp[1].str.replace('L', '')
+    tmp[3] = tmp[3].str.replace('.fastq.gz', '')
     df[1] = tmp[0] + '_' + run_nb + '_' + tmp[1] + '_' + tmp[3] + '_' + tmp[2]
     df[2] = df[1] + '.fastq.gz'
     df_final = pd.DataFrame()
@@ -57,6 +58,7 @@ trimgalore = config['trimgalore']
 umi_whitelist = config['umi_whitelist']
 umi_extract = config['umi_extract']
 umi_dedup = config['umi_dedup']
+consume = config['consume']
 fastx_toolkit = config['fastx_toolkit']
 
 work_dir = config['work_dir']
