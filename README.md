@@ -9,7 +9,7 @@ You can use the pipeline by cloning the repository:
 
 and copying all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your project directory:
 
-`cp -r Snakemake_pipeline/RiboSeq/mouse/ /path/to/your/project`
+`cp Snakemake_pipeline/RiboSeq/mouse/* /path/to/your/project`
 
 **Check the prequisites and edit the config.yaml**
 
@@ -19,7 +19,7 @@ Then, you can create and activate your [`Snakemake`](https://anaconda.org/biocon
 
 `conda activate myenv`
 
-`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` to make demuxbyname.sh and consume.py executable from everywhere
+`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # to make demuxbyname.sh executable from everywhere
 
 and run:
 
@@ -29,7 +29,6 @@ If you need any help, please contact virginie.ricci@unil.ch.
 
 ##  Prerequisites:
 - [demuxbyname.sh](https://github.com/bbushnell/BBTools/blob/master/demuxbyname.sh)
-- [consume.py](https://github.com/gatfieldlab/pipeline/tree/master/gatlab/pipeline/consume.py)
 - [samtools](https://www.htslib.org/)
 - [STAR](https://github.com/alexdobin/STAR)
 - [cutadapt](https://cutadapt.readthedocs.io/en/stable/)
@@ -58,7 +57,7 @@ If you need any help, please contact virginie.ricci@unil.ch.
     2) human rRNA
     3) mouse tRNA
     4) mouse cDNA
-- Split mouse tRNA unmapped reads (.fastq) per barcode
+- Split mouse tRNA unmapped reads (.fastq) by barcode
 - Prepare RSEM reference (rsem-prepare-reference) for mouse genome
 - Perform mouse genome mapping using STAR with RSEM parameters (mapping on genome and projection on transcriptome)
 - Perform "UMI-tools dedup" on transcriptome-projected .bam
@@ -75,7 +74,7 @@ If you need any help, please contact virginie.ricci@unil.ch.
     1) human rRNA
     2) human tRNA
     3) humman cDNA
-- Split human tRNA unmapped reads (.fastq) per barcode
+- Split human tRNA unmapped reads (.fastq) by barcode
 - Prepare RSEM reference (rsem-prepare-reference) for human genome
 - Perform human genome mapping using STAR with RSEM parameters (mapping on genome and projection on transcriptome)
 
