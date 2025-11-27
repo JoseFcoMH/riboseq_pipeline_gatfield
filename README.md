@@ -49,7 +49,7 @@ If you need any help, please contact virginie.ricci@unil.ch.
 ## Pipeline overview for mouse data:
 - Download sequencing data (if needed)
     - You need to manually create a file called "samples.links" containing the links to download the Ribo-seq data.
-    - The links should contain the following **four** arguments: LibID_LaneID_ReadID_RunID.fastq.gz. For example, "PF007_L1_R1_001.fastq.gz"
+    - The links should contain the following **four** arguments: LibID_LaneID_ReadID_RunID**.fastq.gz**. For example, "PF007_L1_R1_001.fastq.gz"
     - The LibID should either start with **'PF'** for monosome-seq data or **'PD'** for disome-seq data.
 - Combine .fastq files according to LibID. For example, "PF007_L1_R1_001.fastq.gz" and "PF007_L2_R1_001.fastq.gz" will be combined as "PF007.fastq.gz".
 - Perform FastQC
