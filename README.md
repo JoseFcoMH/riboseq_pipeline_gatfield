@@ -19,7 +19,7 @@ You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/sna
 
 `conda activate myenv`
 
-`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # to make demuxbyname.sh executable from everywhere
+`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # to make scripts executable from everywhere
 
 Then, prepare the referene files:
 
