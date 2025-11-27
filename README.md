@@ -21,11 +21,11 @@ You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/sna
 
 `export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # to make scripts executable from everywhere
 
-Then, prepare the referene files:
+Then, your can prepare the reference files:
 
 `bash prepare_STAR_refs.sh` # to prepare reference files
 
-And finally, run the pipeline:
+And finally, you can run the pipeline:
 
 `snakemake --cores n`
 
