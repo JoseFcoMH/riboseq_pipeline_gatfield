@@ -542,6 +542,7 @@ rule mapping_mouse_cDNA:
 
 
 
+# unused
 rule mapping_mouse_genome:
     input:
         unmapped = mapping_data + 'STAR/{sample_uniq}/mouse_tRNA.Unmapped.out.mate1',

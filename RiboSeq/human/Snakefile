@@ -506,6 +506,7 @@ rule mapping_human_cDNA:
 
 
 
+# unused
 rule mapping_human_genome:
     input:
         unmapped = mapping_data + 'STAR/{sample_uniq}/human_tRNA.Unmapped.out.mate1',
