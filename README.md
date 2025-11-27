@@ -21,7 +21,7 @@ You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/sna
 
 `export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # to make scripts executable from everywhere
 
-Then, your can prepare the reference files:
+Then, you can prepare the reference files:
 
 `bash prepare_STAR_refs.sh`
 
