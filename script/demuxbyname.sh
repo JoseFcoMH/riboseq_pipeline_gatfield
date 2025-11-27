@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# https://github.com/bbushnell/BBTools/blob/master/demuxbyname.sh
+
 usage(){
 echo "
 Written by Brian Bushnell
