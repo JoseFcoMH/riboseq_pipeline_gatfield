@@ -40,6 +40,7 @@ If you need any help, please contact virginie.ricci@unil.ch.
 - [fastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 - [Trim Galore](https://github.com/FelixKrueger/TrimGalore)
 - [seqtk](https://github.com/lh3/seqtk)
+- [Entrez-Direct: e-utilities](https://www.ncbi.nlm.nih.gov/books/NBK179288/)
 - Modify the software versions in `config.yaml` according to your conda environment
 - Edit `config.yaml` according to your dataset and reference files
 
