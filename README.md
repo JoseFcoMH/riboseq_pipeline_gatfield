@@ -13,15 +13,19 @@ and copying all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your projec
 
 **Check the prequisites and edit the config.yaml**
 
-Then, you can create and activate your [`Snakemake`](https://anaconda.org/bioconda/snakemake) [`conda`](https://conda.io/docs/) environment:
+You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/snakemake) [`conda`](https://conda.io/docs/) environment:
 
 `conda env create -f env.yaml`
 
 `conda activate myenv`
 
-`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # to make demuxbyname.sh executable from everywhere
+`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # to make scripts executable from everywhere
 
-and run:
+Then, you can prepare the reference files:
+
+`bash prepare_refs.sh`
+
+And finally, you can run the pipeline:
 
 `snakemake --cores n`
 
