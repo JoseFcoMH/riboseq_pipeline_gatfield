@@ -23,7 +23,7 @@ You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/sna
 
 Then, your can prepare the reference files:
 
-`bash prepare_STAR_refs.sh` # to prepare reference files
+`bash prepare_STAR_refs.sh`
 
 And finally, you can run the pipeline:
 
