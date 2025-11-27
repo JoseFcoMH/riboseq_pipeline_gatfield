@@ -109,7 +109,7 @@ if source == 'LIMS':
         print('The file "LIMS_samples" was not found.')
 
 ######
-## SRA # to tested
+## SRA # not tested
 ######
 elif source == 'SRA':
 
