@@ -32,7 +32,6 @@ And finally, you can run the pipeline:
 If you need any help, please contact virginie.ricci@unil.ch.
 
 ##  Prerequisites:
-- [demuxbyname.sh](https://github.com/bbushnell/BBTools/blob/master/demuxbyname.sh)
 - [samtools](https://www.htslib.org/)
 - [STAR](https://github.com/alexdobin/STAR)
 - [cutadapt](https://cutadapt.readthedocs.io/en/stable/)
