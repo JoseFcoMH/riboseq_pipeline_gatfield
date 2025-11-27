@@ -53,7 +53,7 @@ If you need any help, please contact virginie.ricci@unil.ch.
     - The LibID should either start with **'PF'** for monosome-seq data or **'PD'** for disome-seq data.
 - Combine .fastq files according to LibID. For example, "PF007_L1_R1_001.fastq.gz" and "PF007_L2_R1_001.fastq.gz" will be combined as "PF007.fastq.gz".
 - Perform FastQC
-- Perform Trim Galore (remove adapters and do size filtering)
+- Perform Trim Galore (remove adapters and apply size filtering)
 - Perform "UMI-tools whitelist" (identify barcodes)
 - Perform "UMI-tools extract" (filter reads without a barcode), size filtering (according to monosome/disome size), quality filtering, and 2nt (from left) trimming
 - Perform FastQC
