@@ -23,6 +23,10 @@ Then, you can create and activate your [`Snakemake`](https://anaconda.org/biocon
 
 and run:
 
+`bash prepare_STAR_refs.sh` # to prepare reference files
+
+and:
+
 `snakemake --cores n`
 
 If you need any help, please contact virginie.ricci@unil.ch.
