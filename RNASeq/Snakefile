@@ -176,6 +176,7 @@ rule all:
         expand(raw_data + '{sample_uniq}.fastq.gz', sample_uniq=uniq_SAMPLES),
         expand(raw_data + '{sample_uniq}_fastqc.html', sample_uniq=uniq_SAMPLES),
         expand(trimmed_data + '{sample_uniq}_trimmed.fq.gz', sample_uniq=uniq_SAMPLES),
+        expand(trimmed_data + '{sample_uniq}_trimmed_fastqc.html', sample_uniq=uniq_SAMPLES),
         RSEM_path + 'Genome',
         expand(rsem_data + '{sample_uniq}/mouse_genome.Aligned.out.bam', sample_uniq=uniq_SAMPLES),
         expand(rsem_data + '{sample_uniq}/mouse_genome.Aligned.toTranscriptome.out.bam', sample_uniq=uniq_SAMPLES),
