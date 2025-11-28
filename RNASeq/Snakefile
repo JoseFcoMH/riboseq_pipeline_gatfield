@@ -265,6 +265,23 @@ rule trim_galore:
 
 
 
+rule final_fastqc:
+    input:
+        trimmed_gz = trimmed_data + '{sample_uniq}_trimmed.fq.gz',
+    
+    output:
+        trimmed_fastqc = trimmed_data + '{sample_uniq}_trimmed_fastqc.html',
+
+    envmodules:
+        envmodules['fastqc'],
+
+    shell:
+        """
+        fastqc --noextract {input.trimmed_gz}
+        """
+        
+
+
 rule RSEM_ref:
     input:
         genome = ref_genome,
