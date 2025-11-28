@@ -967,7 +967,7 @@ rule RSEM_DEPTH:
 
 
 
-rule Stats:
+rule stats:
     input:
         gz = expand(raw_data + '{sample}.fastq.gz', sample=SAMPLES),
         cat_gz = expand(raw_data + '{sample_uniq}.fastq.gz', sample_uniq = uniq_SAMPLES),
