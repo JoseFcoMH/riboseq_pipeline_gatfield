@@ -1,6 +1,8 @@
-https://api-uhts-lgtf.unil.ch/symlink/PF75_L1_R1_001.fastq.gz
-https://api-uhts-lgtf.unil.ch/symlink/PF75_L2_R1_001.fastq.gz
-https://api-uhts-lgtf.unil.ch/symlink/PF76_L1_R1_001.fastq.gz
-https://api-uhts-lgtf.unil.ch/symlink/PF76_L2_R1_001.fastq.gz
-https://api-uhts-lgtf.unil.ch/symlink/PF77_L1_R1_001.fastq.gz
-https://api-uhts-lgtf.unil.ch/symlink/PF77_L2_R1_001.fastq.gz
+https://api-uhts-lgtf.unil.ch/symlink/Ctrl1_L1_R1_001.fastq.gz
+https://api-uhts-lgtf.unil.ch/symlink/Ctrl1_L2_R1_001.fastq.gz
+https://api-uhts-lgtf.unil.ch/symlink/Ctrl2_L1_R1_001.fastq.gz
+https://api-uhts-lgtf.unil.ch/symlink/Ctrl2_L2_R1_001.fastq.gz
+https://api-uhts-lgtf.unil.ch/symlink/Treat1_L1_R1_001.fastq.gz
+https://api-uhts-lgtf.unil.ch/symlink/Treat1_L2_R1_001.fastq.gz
+https://api-uhts-lgtf.unil.ch/symlink/Treat2_L1_R1_001.fastq.gz
+https://api-uhts-lgtf.unil.ch/symlink/Treat2_L2_R1_001.fastq.gz
