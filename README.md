@@ -78,7 +78,7 @@ If you need any help, please contact virginie.ricci@unil.ch.
 - Sequential mapping using STAR
     1) human rRNA
     2) human tRNA
-    3) humman cDNA
+    3) human cDNA
 - Split human tRNA unmapped reads (.fastq) by barcode
 - Prepare RSEM reference (rsem-prepare-reference) for human genome
 - Perform human genome mapping using STAR with RSEM parameters (mapping on genome and projection on transcriptome)
