@@ -86,9 +86,8 @@ If you need any help, please contact virginie.ricci@unil.ch.
 # RNA-seq Snakemake pipeline
 ## Pipeline overview for mouse data:
 - Download sequencing data **manually** and store it in raw_data/
-    - The files must be **.fastq.gz** and contain the **Library ID in the first element when split by '_'** : LibID_LaneID_ReadID_RunID.fastq.gz. For example, "PF007_L1_R1_001.fastq.gz"
-    - The LibID should start with **'PF'** for monosome-seq data and **'PD'** for disome-seq data.
-- Combine .fastq files according to **LibID**. For example, "PF007_L1_R1_001.fastq.gz" and "PF007_L2_R1_001.fastq.gz" will be combined as "PF007.fastq.gz".
+    - The files must be **.fastq.gz** and contain the **Library ID in the first element when split by '_'** : LibID_LaneID_ReadID_RunID.fastq.gz. For example, "RNA007_L1_R1_001.fastq.gz"
+- Combine .fastq files according to **LibID**. For example, "RNA007_L1_R1_001.fastq.gz" and "RNA007_L2_R1_001.fastq.gz" will be combined as "RNA007.fastq.gz".
 - Perform FastQC
 - Perform Trim Galore (remove adapters and apply size filtering)
 - Prepare RSEM reference (rsem-prepare-reference) for mouse genome
