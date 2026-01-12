@@ -1,5 +1,5 @@
 ### LICENCE
-# Copyright 2024-2025 Virginie Ricci
+# Copyright (c) 2024-2025 Virginie Ricci
 
 # This file is part of Snakemake_pipeline (https://github.com/gatfieldlab/Snakemake_pipeline/).
 
@@ -154,7 +154,7 @@ map_out=${stats_data}${id}_mapType.dat
 # mapType_Tx.py for BAM with only Tx and not Gene|Tx
 GENEBED='/data/databases/mouse/Mmusculus.GRCm39.111.startStop.IDS.bed'
 
-samtools view $BAM_Tx | ${work_dir}mapType_Tx.py -b $GENEBED -c 100000 > $map_out
+samtools view $BAM_Tx | ${work_dir}script/mapType_Tx.py -b $GENEBED -c 100000 > $map_out
 
 
 

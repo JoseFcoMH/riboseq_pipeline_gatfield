@@ -1,5 +1,5 @@
 ### LICENCE
-# Copyright 2024-2025 Virginie Ricci
+# Copyright (c) 2024-2025 Virginie Ricci
 
 # This file is part of Snakemake_pipeline (https://github.com/gatfieldlab/Snakemake_pipeline/).
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ### LICENCE
-# Copyright 2024-2025 Virginie Ricci
+# Copyright (c) 2024-2025 Virginie Ricci
 
 # This file is part of Snakemake_pipeline (https://github.com/gatfieldlab/Snakemake_pipeline/).
 
@@ -24,32 +24,6 @@ import glob
 import re
 import subprocess
 
-##############################
-## functions ##
-def SRA_samples(df_f):
-    df = pd.read_csv(df_f, sep='\t')
-    return df
-
-def getLIMS_samples(df_f, prefix, run_nb):
-    df = pd.read_csv(df_f, sep='\t', header=None)
-    ncol = df[0].str.split('/', expand=True).shape[1]-1
-    tmp = pd.DataFrame(df[0].str.split('/', expand=True)[ncol].str.split('_', expand=True))
-    tmp[1] = tmp[1].str.replace('L', '')
-    df[1] = tmp[0] + '_' + run_nb + '_' + tmp[1] + '_' + tmp[3] + '_' + tmp[2]
-    df[2] = df[1] + '.fastq.gz'
-    df_final = pd.DataFrame()
-    df_final[0] = tmp[1]
-    df_final[1] = tmp[3]
-    df_final[2] = tmp[2]
-    df_final[3] = tmp[0] + '_' + run_nb + '_' + tmp[1] + '_' + tmp[3]
-    df_final[4] = tmp[0] + '_' + run_nb + '_' + tmp[1] + '_' + tmp[3] + '_' + tmp[2]
-    df_final[5] = tmp[0] + '_' + run_nb + '_' + tmp[1] + '_' + tmp[3] + '_' + tmp[2] + '.fastq.gz'
-    df_final[6] = tmp[0]
-    df_final[7] = run_nb
-    return (df, df_final)
-    # >> 1       001     R1      PF72_2611_1_001 PF72_2611_1_001_R1      PF72_2611_1_001_R1.fastq.gz     PF72    2611
-
-##############################
 
 
 configfile: 'config.yaml'
@@ -57,24 +31,24 @@ configfile: 'config.yaml'
 envmodules = config['envmodules']
 
 prefix = config['prefix']
-run_nb = config['run_nb']
-source = config['source']
-LIMS_f = config['LIMS_samples']
-SRA_f = config['SRA_samples']
+refs = config['refs']
 STAR_refs_path = config['STAR_refs_path']
 STAR_refs_params = config['STAR_refs_params']
 ref_genome = config['ref_genome']
 ref_GTF = config['ref_GTF']
 ref_version = config['ref_version']
-ref_path = config['ref_path']
 RSEM_path = config['RSEM_path']
 
-cutadapt = config['cutadapt']
 trimgalore = config['trimgalore']
+umi_whitelist = config['umi_whitelist']
+umi_extract = config['umi_extract']
+umi_dedup = config['umi_dedup']
+consume = config['consume']
+fastx_toolkit = config['fastx_toolkit']
 
 work_dir = config['work_dir']
 script = work_dir + 'scripts/'
-config = work_dir + 'config/'
+config_dir = work_dir + 'config/'
 raw_data = work_dir + 'raw_data/'
 umi_data = work_dir + 'umi_data/'
 trimmed_data = work_dir + 'trimmed_data/'
@@ -84,104 +58,37 @@ rsem_data = work_dir + 'RSEM/'
 stats_data = work_dir + 'stats/'
 stats_plot = work_dir + 'stats/plots/'
 
-#######
-## LIMS
-#######
-if source == 'LIMS':
-
-    LIMS_link = list(getLIMS_samples(LIMS_f, prefix, run_nb)[0][0])
-    nb_LIMS = len(LIMS_link)
-    LIMS = getLIMS_samples(LIMS_f, prefix, run_nb)[1]
-
-    LIMS.to_csv(prefix + '_samples.db', sep='\t', index=False, header=False)
-
-    shell('mkdir -p ' + raw_data)
-    shell('cut -f4 ' + prefix + '_samples.db' + ' | uniq > ' + raw_data + prefix + '_data.txt')
-    shell('cut -d"_" -f1 ' + raw_data + prefix + '_data.txt' + ' | sort | uniq > ' + raw_data + prefix + '_data_uniq.txt')
-
-    command_LIMS = expand('wget {link_i} -O ' + raw_data + '{lims}', zip, link_i=LIMS_link, lims=LIMS[5])
-
-    ##############################
-    ## Download .fastq.gz from LIMS
-    ##############################
-    
-    if os.path.isfile(LIMS_f):
-        rule getLIMS:
-            output:
-                gz = expand(raw_data + '{lims}', lims=LIMS[5])
-
-            run:
-                for i in range(nb_LIMS):
-                    print(command_LIMS[i])
-                    shell(command_LIMS[i])
-    
-    else:
-        print('The file "LIMS_samples" was not found.')
 
 
-######
-## SRA # not tested
-######
-elif source == 'SRA':
+SAMPLES_GZ = [os.path.basename(x) for x in glob.glob('raw_data/*.fastq.gz')]
+SAMPLES = [f.replace('.fastq.gz', '') for f in SAMPLES_GZ]
 
-    SRA = SRA_samples(SRA_f)
-    SRR = list(SRA['SRR'])
-    nb_SRA=len(SRR)
+df_final = pd.DataFrame()
+for f in SAMPLES:
+    splits = f.split('_')
+    lib = splits[0]
+    df_final = df_final._append({'file':f, 'lib': lib}, ignore_index=True)
 
-    command_SRA = expand('fastq-dump --gzip {srr_i} -O ' + raw_data, zip, srr_i=SRA['SRR'])
+df_final.to_csv(raw_data + prefix + '_data.txt', sep='\t', index=False, header=False)
+df_final.columns = range(0, len(df_final.columns))
 
-    ##############################
-    ## Download .fastq.gz from SRA
-    ##############################
-
-    if os.path.isfile(SRA_f):
-        rule getSRA:
-            output:
-                gz = expand(raw_data + '{SRA}.fastq.gz', SRA=SRA['SRR'])
-
-            run:
-                for i in range(nb_SRA):
-                    print(command_SRA[i])
-                    #shell(command_SRA[i]) ### TO CHANGE !!!
-    else:
-        print('The file "SRA_samples" was not found.')
-
-elif source == '':
-        print('The files .fastq.gz are already present in raw_data/. No downloading.')
-        SAMPLES_GZ = [os.path.basename(x) for x in glob.glob('raw_data/*.fastq.gz')]
-        SAMPLES = [f.replace('.fastq.gz', '') for f in SAMPLES_GZ]
-
-        df_final = pd.DataFrame()
-        for f in SAMPLES:
-            splits = f.split('_')
-            lib = splits[0]
-            runID = splits[1]
-            lane = splits[2]
-            seqID = splits[3]
-            readID = splits[4]
-            ID = lib + '_' + runID + '_' + lane + '_' + seqID
-            ID_bis = ID + '_' + readID
-            fastq = ID_bis + '.fastq.gz'
-            df_final = df_final._append({'lane': lane, 'seqID': seqID, 'readID': readID, 'ID': ID, 'ID_bis': ID_bis, 'fastq': fastq, 'lib': lib, 'runID': runID}, ignore_index=True)
+shell('cut -f2 ' + raw_data + prefix + '_data.txt' + ' | sort | uniq > ' + raw_data + prefix + '_data_uniq.txt')
         
-        df_final.to_csv(prefix + '_samples.db', sep='\t', index=False, header=False)
-        df_final.columns = range(0, len(df_final.columns))
-        LIMS = df_final
-
-        shell('mkdir -p ' + raw_data)
-        shell('cut -f4 ' + prefix + '_samples.db' + ' | uniq > ' + raw_data + prefix + '_data.txt')
-        shell('cut -d"_" -f1 ' + raw_data + prefix + '_data.txt' + ' | sort | uniq > ' + raw_data + prefix + '_data_uniq.txt')
-
-else:
-    print('The parameter "source" should be either "LIMS", "SRA" or "".')
 
 
-
-SAMPLES = sorted(list(set(LIMS[4])))
-print('Samples')
-print(SAMPLES)
-uniq_SAMPLES = sorted(list(set(LIMS[6])))
-print(uniq_SAMPLES)
+print('SAMPLES')
+SAMPLES = sorted(list(set(df_final[0])))
+print(SAMPLES) # ['PF72_2611_2_001_R1', 'PF73_2611_1_001_R1', 'PF72_2611_1_001_R1', 'PF73_2611_2_001_R1']
+print('uniq_SAMPLES')
+uniq_SAMPLES = sorted(list(set(df_final[1])))
+print(uniq_SAMPLES) # PF72, PF73, ...
+SAMPLES_TYPE = dict() # monosome, disome, ...
+SAMPLES_RANGE = dict() # 28 37, 45 70, ... 
+# consume = {"PF":"28 37", "PD":"45 70", "PT":"23 62", "P3":"75 100"}
+for f in uniq_SAMPLES:
+    ribotype=f[:2]
+    SAMPLES_TYPE[f] = ribotype
+    SAMPLES_RANGE[f] = consume[ribotype]
 
 
 ##############################

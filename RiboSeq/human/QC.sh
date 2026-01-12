@@ -1,5 +1,5 @@
 ### LICENCE
-# Copyright 2024-2025 Virginie Ricci
+# Copyright (c) 2024-2025 Virginie Ricci
 
 # This file is part of Snakemake_pipeline (https://github.com/gatfieldlab/Snakemake_pipeline/).
 
@@ -433,7 +433,7 @@ cat $flagstat_split | while read line; do
     BAM=${work_dir}RSEM/${id}/${bc}/human_genome.Aligned.out.bam
     BAM_Tx=${work_dir}RSEM/${id}/${bc}/human_genome.Aligned.toTranscriptome.out.bam
 
-    samtools view $BAM_Tx | ${work_dir}mapType_Tx.py -b $GENEBED -c 100000 > $map_out
+    samtools view $BAM_Tx | ${work_dir}script/mapType_Tx.py -b $GENEBED -c 100000 > $map_out
 done
 
 

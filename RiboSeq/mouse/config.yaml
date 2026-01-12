@@ -8,10 +8,8 @@ envmodules:
   chip-seq: chip-seq/1.5.5
   bedtools: bedtools/2.28.0
   UMI-tools: UMI-tools/1.0.0git
-  getLIMS: getLIMS/6.0.2
   pipeline: pipeline/0.3.2
   rpfTools: rpfTools/1.2.0
-  getLIMS: getLIMS/6.0.2
   fastqc: fastqc/0.12.1
   trimgalore: TrimGalore/0.6.10
   UCSC: ucsc-tools/dec-10-2019
@@ -21,11 +19,6 @@ envmodules:
 
 work_dir: '/path/to/your/project/' # don't forget the last '/'
 prefix: 'NovaSeq'
-run_nb: '260'
-
-source: '' # LIMS, SRA or '' (if already downloaded >> raw_data/*.fastq.gz)
-LIMS_samples: 'LIMS_samples.links'
-SRA_samples: 'SRA_samples.txt'
 
 
 # Default >> for LIMS
