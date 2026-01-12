@@ -1,4 +1,4 @@
-In the lab of David Gatfield, we developped pipelines to process and map Ribo-seq and RNA-seq data. The Ribo-seq pipeline was based on the previous [`pipeline`](https://github.com/gatfieldlab/pipeline) [(Arpat et al. 2020)](https://pubmed.ncbi.nlm.nih.gov/32703885/). 
+In the lab of David Gatfield, we developped pipelines to process and map Ribo-seq and RNA-seq data. The Ribo-seq pipeline was based on the previous [`pipeline`](https://github.com/gatfieldlab/pipeline) [(Arpat et al. 2020)](https://pubmed.ncbi.nlm.nih.gov/32703885/) and is made for multiplexed sequencing data. 
 
 The pipeline includes a Snakefile, a config.yaml, software commands, and R and Python scripts. 
 
