@@ -27,7 +27,7 @@ You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/sna
 
 Then, you can download and prepare the reference files:
 
-`bash prepare_refs.sh`
+`bash script/prepare_refs.sh`
 
 And finally, you can run the pipeline:
 
