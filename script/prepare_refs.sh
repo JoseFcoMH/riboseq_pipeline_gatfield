@@ -156,7 +156,11 @@ cat ${path_ref}fasta/${organism}.${GRC}.${cur_release}.rrna.ensembl.fa ${path_re
 
 # tRNA + mt-tRNA
 echo Are you sure  $tRNA_link  is the right file? This should be manually checked!
-wget --no-check-certificate -O ${path_ref}fasta/${organism}.${GRC}.${cur_release}.trna.ensembl.fa $tRNA_link
+cur_trna_output=${path_ref}fasta/${organism}.${GRC}.${cur_release}.trna.ensembl.fa
+if [ ! -f ${cur_trna_output} ]; then
+  wget --progress=dot:giga --append-output=${cur_log_file} --no-check-certificate -O - $tRNA_link \
+    | gzip -dc > ${cur_trna_output}
+fi
 
 cat ${path_ref}fasta/${organism}.${GRC}.${cur_release}.trna.ensembl.fa ${path_ref}fasta/${organism}.${GRC}.${cur_release}.mt-trna.ensembl.fa > ${path_ref}fasta/${organism}.${GRC}.${cur_release}.all-trna.ensembl.fa
 
