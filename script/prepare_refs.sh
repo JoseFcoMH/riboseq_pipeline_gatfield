@@ -70,25 +70,9 @@ STAR_DIR=${path_ref}star/${organism}.${GRC}.${cur_release}
 
 cur_log_file=${PWD}/fetch_ensembl_rel-${cur_release}.log
 
-# functions
-get_version () {
-  if command -v ${1} >/dev/null 2>&1; then
-    ver_cmd=${1} --version 2>&1
-    echo $(eval ${ver_cmd})
-  fi
-}
-
 # checks
-samtools_ver=$( get_version samtools )
-if [ -z ${samtools_ver} ]; then
-  echo Could not get samtools version - quitting
-  exit 1
-fi
-star_ver=$( get_version STAR )
-if [ -z ${star_ver} ]; then
-	echo Could not get STAR version - quitting
-	exit 1
-fi
+samtools_ver=$(samtools --version | head -1 | cut -d' ' -f2)
+star_ver=$(STAR --version)
 
 # logs
 echo $cur_log_file
