@@ -10,6 +10,7 @@ You can use the pipeline by cloning the repository:
 and copying all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your project directory:
 
 `cp Snakemake_pipeline/RiboSeq/mouse/* /path/to/your/project`
+`cp -r Snakemake_pipeline/RiboSeq/script /path/to/your/project`
 
 **Check the prequisites and edit the config.yaml**
 
