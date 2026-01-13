@@ -21,7 +21,7 @@ You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/sna
 
 `conda env create -f env.yaml`
 
-`conda activate myenv`
+`conda activate snakepipe`
 
 `export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # to make scripts executable from everywhere
 
