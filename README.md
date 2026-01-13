@@ -11,8 +11,6 @@ and copying all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your projec
 
 `cp Snakemake_pipeline/RiboSeq/mouse/* /path/to/your/project`
 
-`cp -r Snakemake_pipeline/RiboSeq/script /path/to/your/project`
-
 **Check the prequisites and edit the config.yaml**
 
 You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/snakemake) [`conda`](https://conda.io/docs/) environment:
