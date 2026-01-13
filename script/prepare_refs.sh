@@ -120,11 +120,11 @@ head -n 100 ${cur_gtf_output} | grep -e '^#' > ${cur_gtf_sorted}
 header_len=$((1 + $(wc -l < ${cur_gtf_sorted})))
 echo   .. splitting into chr files
 tail -n +${header_len} ${cur_gtf_output} \
-  | awk '{print $0 > temp_sort_split_$1}'
+  | awk '{print $0 > "temp_sort_split_"$1}'
 temp_files=$(ls temp_sort_split_* | sort)
 ordered_temp_files=$( echo ${temp_files//_/ } \
   | join -11 -24 ${path_ref}chrom_order.txt - \
-  | sort -k2,2n | awk '{ print temp_sort_split_$1}' )
+  | sort -k2,2n | awk '{ print "temp_sort_split_"$1}' )
 echo   .. sorting split files
 echo ${ordered_temp_files} \
   | xargs -P 6 -I '{}' bash -c 'sort -k4,4n -o {} {}'
