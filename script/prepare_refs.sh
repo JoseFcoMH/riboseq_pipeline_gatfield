@@ -42,7 +42,7 @@ path_ref=/data/databases/mouse/
 
 
 tRNA_link=https://gtrnadb.ucsc.edu/genomes/eukaryota/Mmusc39/mm39-tRNAs.fa
-echo Are you sure  $tRNA_link  is the right file? This should be manually checked!
+echo "Are you sure  $tRNA_link  is the right file? This should be manually checked!"
 
 preribo_45S='NR_046233.2'
 ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT 
