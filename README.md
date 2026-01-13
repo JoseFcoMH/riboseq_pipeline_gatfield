@@ -17,6 +17,8 @@ You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/sna
 
 `cp Snakemake_pipeline/env.yaml /path/to/your/project`
 
+`cd /path/to/your/project`
+
 `conda env create -f env.yaml`
 
 `conda activate myenv`
