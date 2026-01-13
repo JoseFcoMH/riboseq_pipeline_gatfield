@@ -121,7 +121,7 @@ tail -n +${header_len} ${cur_gtf_output} \
   | awk '{print $0 > temp_sort_split_$1}'
 temp_files=$(ls temp_sort_split_* | sort)
 ordered_temp_files=$( echo ${temp_files//_/ } \
-  | join -11 -24 /data/databases/human/chrom_order.txt - \
+  | join -11 -24 ${path_ref}chrom_order.txt - \
   | sort -k2,2n | awk '{ print temp_sort_split_$1}' )
 echo   .. sorting split files
 echo ${ordered_temp_files} \
