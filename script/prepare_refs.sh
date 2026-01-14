@@ -121,16 +121,21 @@ header_len=$((1 + $(wc -l < ${cur_gtf_sorted})))
 echo   .. splitting into chr files
 tail -n +${header_len} ${cur_gtf_output} \
   | awk '{print $0 > "temp_sort_split_"$1}'
-temp_files=$(ls temp_sort_split_* | sort)
-ordered_temp_files=$( echo ${temp_files//_/ } \
-  | join -11 -24 ${path_ref}chrom_order.txt - \
-  | sort -k2,2n | awk '{ print "temp_sort_split_"$1}' )
-echo   .. sorting split files
-echo ${ordered_temp_files} \
-  | xargs -P 6 -I '{}' bash -c 'sort -k4,4n -o {} {}'
-echo   .. joining and cleaning split files
-echo ${ordered_temp_files} \
-  | xargs -P 1 -I '{}' bash -c 'rm {}'
+temp_files=$(ls temp_sort_split_* | sort -V)
+wc_files=$(echo $temp_files | wc -w)
+
+
+touch ${path_ref}chrom_order.txt
+rm ${path_ref}chrom_order.txt
+for i in `seq 1 $wc_files`; do
+        F=$(echo $temp_files | cut -d' ' -f${i})
+        f=$(echo $temp_files | cut -d' ' -f${i} | cut -d'_' -f4)
+        echo -e "${f}\t${i}" >> ${path_ref}chrom_order.txt
+
+        cat $F >> ${cur_gtf_sorted}
+done
+
+echo ${temp_files} | xargs -P 1 -I '{}' bash -c 'rm {}'
 
 
 
