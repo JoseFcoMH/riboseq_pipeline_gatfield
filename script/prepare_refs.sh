@@ -41,7 +41,7 @@ cur_release=111
 path_ref=/data/databases/mouse/
 
 
-#tRNA_link=https://gtrnadb.ucsc.edu/genomes/eukaryota/Mmusc39/mm39-tRNAs.fa # previously this link
+#tRNA_link=https://gtrnadb.ucsc.edu/genomes/eukaryota/Mmusc39/mm39-tRNAs.fa # previous link, same file
 tRNA_link=https://gtrnadb.org/genomes/eukaryota/Mmusc39/mm39-tRNAs.fa 
 
 preribo_45S='NR_046233.2'
