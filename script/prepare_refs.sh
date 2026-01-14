@@ -231,5 +231,4 @@ seqkit stats ${cur_rrna_output} > ${path_ref}fasta/${organism}.${GRC}.${cur_rele
 seqkit stats ${cur_trna_output} >> ${path_ref}fasta/${organism}.${GRC}.${cur_release}.seqkit_stats.txt
 seqkit stats ${cur_cdna_output} >> ${path_ref}fasta/${organism}.${GRC}.${cur_release}.seqkit_stats.txt
 seqkit stats ${cur_dna_output} >> ${path_ref}fasta/${organism}.${GRC}.${cur_release}.seqkit_stats.txt
-cut -f1,2 ${cur_dna_output}.fai > ${path_ref}fasta/${organism}.${GRC}.${cur_release}.chromsizes.txt 
 
