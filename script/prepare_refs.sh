@@ -42,7 +42,6 @@ path_ref=/data/databases/mouse/
 
 
 tRNA_link=https://gtrnadb.ucsc.edu/genomes/eukaryota/Mmusc39/mm39-tRNAs.fa
-echo "Are you sure  $tRNA_link  is the right file? This should be manually checked!"
 
 preribo_45S='NR_046233.2'
 ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT 
@@ -157,6 +156,7 @@ cat ${path_ref}fasta/${organism}.${GRC}.${cur_release}.rrna.ensembl.fa ${path_re
 
 
 # tRNA + mt-tRNA
+echo "Are you sure  $tRNA_link  is the right file? This should be manually checked!"
 cur_trna_output=${path_ref}fasta/${organism}.${GRC}.${cur_release}.trna.ensembl.fa
 if [ ! -f ${cur_trna_output} ]; then
   wget --progress=dot:giga --append-output=${cur_log_file} --no-check-certificate -O - $tRNA_link \
