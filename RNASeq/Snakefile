@@ -40,11 +40,6 @@ ref_version = config['ref_version']
 RSEM_path = config['RSEM_path']
 
 trimgalore = config['trimgalore']
-umi_whitelist = config['umi_whitelist']
-umi_extract = config['umi_extract']
-umi_dedup = config['umi_dedup']
-consume = config['consume']
-fastx_toolkit = config['fastx_toolkit']
 
 work_dir = config['work_dir']
 script = work_dir + 'scripts/'
