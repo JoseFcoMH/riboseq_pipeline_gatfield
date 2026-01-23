@@ -137,7 +137,7 @@ done
 
 echo ${temp_files} | xargs -P 1 -I '{}' bash -c 'rm {}'
 
-IDS=${path_ref}${cur_release}.startStop.IDS.bed
+IDS=${path_ref}${organism}.${GRC}.${cur_release}.startStop.IDS.bed
 python annotateTranscripts.py -g ${cur_gtf_sorted} -t CDS > Mmusculus.GRCm39.111.startStop.IDS.bed
 
 
