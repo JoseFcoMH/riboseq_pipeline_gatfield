@@ -65,6 +65,7 @@ for f in SAMPLES:
     lib = splits[0]
     df_tmp = pd.DataFrame([{'file':f, 'lib': lib}])
     df_final = pd.concat([df_final, df_tmp], ignore_index=True)
+    df_final.sort_values('file')
 
 df_final.to_csv(raw_data + prefix + '_data.txt', sep='\t', index=False, header=False)
 df_final.columns = range(0, len(df_final.columns))
@@ -118,7 +119,7 @@ rule all:
 ##########################################################################################################################
 rule combine_fastq:
     input: 
-        db = work_dir + prefix + '_data_uniq.txt',
+        db = raw_data + prefix + '_data_uniq.txt',
         gz = expand(raw_data + '{sample}.fastq.gz', sample=SAMPLES),
 
     output:
