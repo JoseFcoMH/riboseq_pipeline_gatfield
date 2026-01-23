@@ -65,7 +65,7 @@ for f in SAMPLES:
     lib = splits[0]
     df_tmp = pd.DataFrame([{'file':f, 'lib': lib}])
     df_final = pd.concat([df_final, df_tmp], ignore_index=True)
-    df_final.sort_values('file')
+    df_final = df_final.sort_values('file')
 
 df_final.to_csv(raw_data + prefix + '_data.txt', sep='\t', index=False, header=False)
 df_final.columns = range(0, len(df_final.columns))
