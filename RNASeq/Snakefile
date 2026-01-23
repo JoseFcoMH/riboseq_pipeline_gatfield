@@ -54,7 +54,6 @@ stats_data = work_dir + 'stats/'
 stats_plot = work_dir + 'stats/plots/'
 
 
-shell('mkdir -p ' + raw_data)
 
 SAMPLES_GZ = [os.path.basename(x) for x in glob.glob('raw_data/*.fastq.gz')]
 SAMPLES = [f.replace('.fastq.gz', '') for f in SAMPLES_GZ]
