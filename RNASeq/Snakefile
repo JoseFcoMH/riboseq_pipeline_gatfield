@@ -78,13 +78,6 @@ print(SAMPLES) # ['PF72_2611_2_001_R1', 'PF73_2611_1_001_R1', 'PF72_2611_1_001_R
 print('uniq_SAMPLES')
 uniq_SAMPLES = sorted(list(set(df_final[1])))
 print(uniq_SAMPLES) # PF72, PF73, ...
-SAMPLES_TYPE = dict() # monosome, disome, ...
-SAMPLES_RANGE = dict() # 28 37, 45 70, ... 
-# consume = {"PF":"28 37", "PD":"45 70", "PT":"23 62", "P3":"75 100"}
-for f in uniq_SAMPLES:
-    ribotype=f[:2]
-    SAMPLES_TYPE[f] = ribotype
-    SAMPLES_RANGE[f] = consume[ribotype]
 
 
 ##############################
