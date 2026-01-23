@@ -63,7 +63,7 @@ df_final = pd.DataFrame()
 for f in SAMPLES:
     splits = f.split('_')
     lib = splits[0]
-    df_tmp = pd.DataFrame({'file':f, 'lib': lib})
+    df_tmp = pd.DataFrame([{'file':f, 'lib': lib}])
     df_final = pd.concat([df_final, df_tmp], ignore_index=True)
 
 df_final.to_csv(raw_data + prefix + '_data.txt', sep='\t', index=False, header=False)
