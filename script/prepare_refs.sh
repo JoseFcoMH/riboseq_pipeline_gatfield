@@ -29,6 +29,7 @@
 export PATH=$PATH:/home/vricci/miniconda3/bin/
 # efetch, esearch, ...
 
+chmod 755 -R <path/to/>Snakemake_pipeline/script
 export PATH=$PATH:<path/to/>Snakemake_pipeline/script
 # convert_ensembl_ids.py and Get_rRNA_tRNA.R
 
