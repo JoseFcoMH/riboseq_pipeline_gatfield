@@ -18,6 +18,7 @@
 id=$1
 work_dir=$2
 DB=$3
+script=$4
 
 
 raw_data=${work_dir}raw_data/
@@ -155,7 +156,7 @@ map_out=${stats_data}${id}_mapType.dat
 # mapType_Tx.py for BAM with only Tx and not Gene|Tx
 GENEBED=${DB}.startStop.IDS.bed
 
-samtools view $BAM_Tx | mapType_Tx.py -b $GENEBED -c 100000 > $map_out
+samtools view $BAM_Tx | ${script}mapType_Tx.py -b $GENEBED -c 100000 > $map_out
 
 
 
