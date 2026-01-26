@@ -18,6 +18,7 @@
 id=$1
 work_dir=$2
 DB=$3
+script=$4
 
 # work_dir='/data/vricci/SnakemakeTest/'
 # id='PF73_2611_1_001_R1'
@@ -434,7 +435,7 @@ cat $flagstat_split | while read line; do
     BAM=${work_dir}RSEM/${id}/${bc}/human_genome.Aligned.out.bam
     BAM_Tx=${work_dir}RSEM/${id}/${bc}/human_genome.Aligned.toTranscriptome.out.bam
 
-    samtools view $BAM_Tx | mapType_Tx.py -b $GENEBED -c 100000 > $map_out
+    samtools view $BAM_Tx | ${script}mapType_Tx.py -b $GENEBED -c 100000 > $map_out
 done
 
 
