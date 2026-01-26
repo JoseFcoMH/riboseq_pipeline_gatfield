@@ -33,6 +33,10 @@ And finally, you can run the pipeline:
 
 `snakemake --cores n`
 
+To run the pipeline on a cluster (e.g. Curnagl cluster of UNIL), you need a global profile and a workflow profile (in addition to the pipeline config.yaml):
+
+`snakemake --profile $global_profile --workflow-profile $workflow_profile --configfile $config`
+
 If you need any help, please contact virginie.ricci@unil.ch.
 
 ##  Prerequisites:
