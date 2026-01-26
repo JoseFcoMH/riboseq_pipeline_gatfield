@@ -438,7 +438,7 @@ awk '{printf("%s\t%s\n", $2, $1)}' ${stats_data}${id}_filtered_readLenDist.tmp >
 rm ${stats_data}${id}_filtered_readLenDist.tmp
 
 # BAM - split per barcode
-bioawk=/home/vricci/miniconda3/bin/bioawk
+#bioawk=/home/vricci/miniconda3/bin/bioawk
 echo "   projected to mouse_Tx"
 
 flagstat_split=${mapping_data}${id}/mouse_tRNA.Unmapped.out.mate1.split.flagstats
@@ -452,7 +452,7 @@ cat $flagstat_split | while read line; do
     BAM_Tx=${work_dir}RSEM/${id}/${bc}/mouse_genome.Aligned.toTranscriptome.out.bam
 
     if [ ! -f ${stats_data}${id}_${bc}_mappedTx_readLenDist.dat ]; then
-        samtools view $BAM_Tx | $bioawk -c sam '{hist[length($seq)]++} END {for (l in hist) print l, hist[l]}' | \
+        samtools view $BAM_Tx | bioawk -c sam '{hist[length($seq)]++} END {for (l in hist) print l, hist[l]}' | \
             sort -n -k1 > ${stats_data}${id}_${bc}_mappedTx_readLenDist.dat
     fi
 done
