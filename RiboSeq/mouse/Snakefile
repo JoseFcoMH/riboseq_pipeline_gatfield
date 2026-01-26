@@ -913,22 +913,25 @@ rule stats:
             stats_out={params.stats_data}${{sample}}_stats.txt
             stats_len={params.stats_data}${{sample}}_stats_len.txt
 
-            seqkit stats --tabular --threads 10 {params.raw_data}${{sample}}.fastq.gz > {params.stats_data}stats_${{sample}}.tmp
+            if [ ! -f $stats_out ] && [ ! -f $stats_len ]; then
 
-            num_seqs=$(cut -d$"\t" -f4 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
-            sum_len=$(cut -d$"\t" -f5 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
-            min_len=$(cut -d$"\t" -f6 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
-            avg_len=$(cut -d$"\t" -f7 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
-            max_len=$(cut -d$"\t" -f8 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
-
-            echo -e "${{sample}}\traw_fastq\tnum_seqs\t${{num_seqs}}" > ${{stats_out}}
-
-            echo -e "${{sample}}\traw_fastq\tsum_len\t${{sum_len}}" > ${{stats_len}}
-            echo -e "${{sample}}\traw_fastq\tmin_len\t${{min_len}}" >> ${{stats_len}}
-            echo -e "${{sample}}\traw_fastq\tavg_len\t${{avg_len}}" >> ${{stats_len}}
-            echo -e "${{sample}}\traw_fastq\tmax_len\t${{max_len}}" >> ${{stats_len}}
-
-            rm {params.stats_data}stats_${{sample}}.tmp
+                seqkit stats --tabular --threads 10 {params.raw_data}${{sample}}.fastq.gz > {params.stats_data}stats_${{sample}}.tmp
+    
+                num_seqs=$(cut -d$"\t" -f4 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
+                sum_len=$(cut -d$"\t" -f5 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
+                min_len=$(cut -d$"\t" -f6 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
+                avg_len=$(cut -d$"\t" -f7 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
+                max_len=$(cut -d$"\t" -f8 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
+    
+                echo -e "${{sample}}\traw_fastq\tnum_seqs\t${{num_seqs}}" > ${{stats_out}}
+    
+                echo -e "${{sample}}\traw_fastq\tsum_len\t${{sum_len}}" > ${{stats_len}}
+                echo -e "${{sample}}\traw_fastq\tmin_len\t${{min_len}}" >> ${{stats_len}}
+                echo -e "${{sample}}\traw_fastq\tavg_len\t${{avg_len}}" >> ${{stats_len}}
+                echo -e "${{sample}}\traw_fastq\tmax_len\t${{max_len}}" >> ${{stats_len}}
+    
+                rm {params.stats_data}stats_${{sample}}.tmp
+            fi
         done
 
         # concatenated raw data
@@ -936,22 +939,25 @@ rule stats:
             stats_out={params.stats_data}${{sample_uniq}}_stats.txt
             stats_len={params.stats_data}${{sample_uniq}}_stats_len.txt
 
-            seqkit stats --tabular --threads 10 {params.raw_data}${{sample_uniq}}.fastq.gz > {params.stats_data}stats_${{sample_uniq}}.tmp
+            if [ ! -f $stats_out ] && [ ! -f $stats_len ]; then
 
-            num_seqs=$(cut -d$"\t" -f4 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
-            sum_len=$(cut -d$"\t" -f5 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
-            min_len=$(cut -d$"\t" -f6 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
-            avg_len=$(cut -d$"\t" -f7 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
-            max_len=$(cut -d$"\t" -f8 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
-
-            echo -e "${{sample_uniq}}\traw_fastq\tnum_seqs\t${{num_seqs}}" > ${{stats_out}}
-
-            echo -e "${{sample_uniq}}\traw_fastq\tsum_len\t${{sum_len}}" > ${{stats_len}}
-            echo -e "${{sample_uniq}}\traw_fastq\tmin_len\t${{min_len}}" >> ${{stats_len}}
-            echo -e "${{sample_uniq}}\traw_fastq\tavg_len\t${{avg_len}}" >> ${{stats_len}}
-            echo -e "${{sample_uniq}}\traw_fastq\tmax_len\t${{max_len}}" >> ${{stats_len}}
-
-            rm {params.stats_data}stats_${{sample_uniq}}.tmp
+                seqkit stats --tabular --threads 10 {params.raw_data}${{sample_uniq}}.fastq.gz > {params.stats_data}stats_${{sample_uniq}}.tmp
+    
+                num_seqs=$(cut -d$"\t" -f4 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
+                sum_len=$(cut -d$"\t" -f5 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
+                min_len=$(cut -d$"\t" -f6 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
+                avg_len=$(cut -d$"\t" -f7 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
+                max_len=$(cut -d$"\t" -f8 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
+    
+                echo -e "${{sample_uniq}}\traw_fastq\tnum_seqs\t${{num_seqs}}" > ${{stats_out}}
+    
+                echo -e "${{sample_uniq}}\traw_fastq\tsum_len\t${{sum_len}}" > ${{stats_len}}
+                echo -e "${{sample_uniq}}\traw_fastq\tmin_len\t${{min_len}}" >> ${{stats_len}}
+                echo -e "${{sample_uniq}}\traw_fastq\tavg_len\t${{avg_len}}" >> ${{stats_len}}
+                echo -e "${{sample_uniq}}\traw_fastq\tmax_len\t${{max_len}}" >> ${{stats_len}}
+    
+                rm {params.stats_data}stats_${{sample_uniq}}.tmp
+            fi
         done
 
         # combined results
