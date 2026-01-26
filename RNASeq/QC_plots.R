@@ -21,6 +21,8 @@ library(cowplot)
 library(DESeq2)
 library(RColorBrewer)
 library(ggpubr)
+library(dplyr)
+library(stringr)
 
 args<-commandArgs(TRUE)
 
@@ -52,6 +54,7 @@ for (s in samples_df$Sample){
     
 }
 head(stats_samples)
+stats_samples = stats_samples %>% arrange(factor(Sample, levels=unique(str_sort(stats_samples$Sample, numeric = TRUE))))
 # nums_seq == input
 # output == input - too_short
 # output == uniq_map + multi_map + unmapped
@@ -69,6 +72,7 @@ names(colsType) = c('input', 'w_adapters', 'too_short', 'output', 'uniq_map', 'm
 # Plot Z
 # input
 df_Z = stats_samples[stats_samples$Type == 'input',]
+df_Z$Sample = factor(df_Z$Sample, levels=unique(str_sort(stats_samples$Sample, numeric = TRUE)))
 
 plot_Z = ggplot(df_Z, aes(x=Sample, y=Counts, fill=Type)) +
     geom_bar(stat='identity') +
@@ -84,6 +88,7 @@ df_A = stats_samples[stats_samples$Type %in% c('output', 'too_short'),]
 head(df_A); dim(df_A)
 
 df_A$Type = factor(df_A$Type, levels=c('too_short', 'output'))
+df_A$Sample = factor(df_A$Sample, levels=unique(str_sort(stats_samples$Sample, numeric = TRUE)))
 
 plot_A = ggplot(df_A, aes(x=Sample, y=Counts, fill=Type)) +
     geom_bar(stat='identity') +
@@ -106,6 +111,8 @@ df_B = stats_samples[stats_samples$Type %in% c('uniq_map', 'multi_map', 'unmappe
 df_B$Type = factor(df_B$Type, levels=c('unmapped', 'multi_map', 'uniq_map'))
 head(df_B); dim(df_B)
 
+df_B$Sample = factor(df_B$Sample, levels=unique(str_sort(stats_samples$Sample, numeric = TRUE)))
+
 plot_B = ggplot(df_B, aes(x=Sample, y=Counts, fill=Type)) +
     geom_bar(stat='identity') +
     scale_fill_manual(values=colsType) +
@@ -127,6 +134,7 @@ df_B = stats_samples[stats_samples$Type %in% kinds,]
 df_B$Type = factor(df_B$Type, levels=rev(kinds))
 
 head(df_B); dim(df_B)
+df_B$Sample = factor(df_B$Sample, levels=unique(str_sort(stats_samples$Sample, numeric = TRUE)))
 
 colsMapType = c('seagreen3', 'palevioletred1', 'cornflowerblue', 'tan3', 'mediumvioletred', 'darkblue', 'seagreen')
 names(colsMapType) = kinds
@@ -178,7 +186,10 @@ for (s in samples_df$Sample){
 
 }
 maptype_df <- maptype_df[maptype_df$Counts > 100,]
+maptype_df = maptype_df %>% arrange(factor(Sample, levels=unique(str_sort(maptype_df$Sample, numeric = TRUE))))
 head(maptype_df); dim(maptype_df)
+
+maptype_df$Sample = factor(maptype_df$Sample, levels=unique(str_sort(stats_samples$Sample, numeric = TRUE)))
 
 colsTxType = c(brewer.pal(n = 12, name = "Set3")[c(1, 3, 5, 7, 9, 11, 2, 4, 6, 8, 10, 12)], 'blue', 'green', 'red')
 names(colsTxType) = sort(unique(maptype_df$Description))
@@ -212,7 +223,10 @@ for (s in samples_df$Sample){
     trimmed_readLen_df = rbind(trimmed_readLen_df, trimmed_readLen_s)
 
 }
+trimmed_readLen_df = trimmed_readLen_df %>% arrange(factor(Sample, levels=unique(str_sort(trimmed_readLen_df$Sample, numeric = TRUE))))
 head(trimmed_readLen_df); dim(trimmed_readLen_df)
+
+trimmed_readLen_df$Sample = factor(trimmed_readLen_df$Sample, levels=unique(str_sort(stats_samples$Sample, numeric = TRUE)))
 
 # plot_D
 # trimmed readLen distribution
@@ -254,7 +268,10 @@ for (s in samples_df$Sample){
     mappedTx_readLen_df = rbind(mappedTx_readLen_df, mappedTx_readLen_s)
 
 }
+mappedTx_readLen_df = mappedTx_readLen_df %>% arrange(factor(Sample, levels=unique(str_sort(mappedTx_readLen_df$Sample, numeric = TRUE))))
 head(mappedTx_readLen_df); dim(mappedTx_readLen_df)
+
+mappedTx_readLen_df$Sample = factor(mappedTx_readLen_df$Sample, levels=unique(str_sort(stats_samples$Sample, numeric = TRUE)))
 
 # plot_E
 # trimmed readLen distribution
@@ -297,8 +314,10 @@ for (s in samples_df$Sample){
 }
 head(RSEM_df); dim(RSEM_df)
 RSEM_df = RSEM_df[!is.na(RSEM_df$Counts),]
+RSEM_df = RSEM_df %>% arrange(factor(Sample, levels=unique(str_sort(RSEM_df$Sample, numeric = TRUE))))
 head(RSEM_df); dim(RSEM_df)
 
+RSEM_df$Sample = factor(RSEM_df$Sample, levels=unique(str_sort(stats_samples$Sample, numeric = TRUE)))
 
 print('06_RSEM_TotalExpectedCounts.pdf')
 pdf(file=paste0(path_plot, '06_RSEM_TotalExpectedCounts.pdf'), height=9, width=12)

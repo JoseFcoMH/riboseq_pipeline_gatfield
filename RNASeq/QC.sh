@@ -173,3 +173,4 @@ total_expected_count_isoforms=$(cut -f5 $RSEM_isoforms | tail -n +2 | awk '{s+=$
 echo -e "${id}\t${bc}\texpected_count\t${total_expected_count_genes}" > $RSEM_out
 # echo -e "${id}\t${bc}\texpected_count\t${total_expected_count_isoforms}" >> $RSEM_out
 # both are the same value!
+

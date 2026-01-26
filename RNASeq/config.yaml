@@ -16,7 +16,7 @@ envmodules:
   DeepTools: deeptools/3.5.6/
 
 
-work_dir: '/path/to/your/project/' # don't forget the last '/'
+work_dir: '/work/FAC/FBM/CIG/dgatfiel/default/vricci/Lisa/DENR_woCrossLink_RNA/' # don't forget the last '/'
 prefix: 'RNASeq'
 
 
@@ -26,7 +26,7 @@ trimgalore: '--quality 24 --phred33 --length 50 --adapter CTGTCTCTTATACACATCT --
 refs: [mouse_genome]
 
 STAR_refs_path: {
-  "mouse_genome": "/data/databases/mouse/star/Mmusculus.GRCm39.111/"
+  "mouse_genome": "/work/FAC/FBM/CIG/dgatfiel/default/vricci/databases/mouse/star/Mmusculus.GRCm39.111/"
 }
 
 STAR_params: 
@@ -42,7 +42,7 @@ STAR_refs_params: {
 
 # RSEM
 ref_version: 'Mmusculus.GRCm39.111'
-ref_path: '/data/databases/mouse/'
-ref_genome: '/data/databases/mouse/fasta/Mmusculus.GRCm39.111.dna.ensembl.fa'
-ref_GTF: '/data/databases/mouse/gtf/Mmusculus.GRCm39.111.sorted.gtf'
-RSEM_path: '/data/databases/RSEM/Mmusculus.GRCm39.111/'
+ref_path: '/work/FAC/FBM/CIG/dgatfiel/default/vricci/databases/mouse/'
+ref_genome: '/work/FAC/FBM/CIG/dgatfiel/default/vricci/databases/mouse/fasta/Mmusculus.GRCm39.111.dna.ensembl.fa'
+ref_GTF: '/work/FAC/FBM/CIG/dgatfiel/default/vricci/databases/mouse/gtf/Mmusculus.GRCm39.111.sorted.gtf'
+RSEM_path: '/work/FAC/FBM/CIG/dgatfiel/default/vricci/databases/RSEM/Mmusculus.GRCm39.111/'
