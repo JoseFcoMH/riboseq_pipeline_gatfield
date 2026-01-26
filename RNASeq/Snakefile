@@ -415,6 +415,8 @@ rule stats:
         bam = expand(rsem_data + '{sample_uniq}/mouse_genome.Aligned.toTranscriptome.out.bam', sample_uniq = uniq_SAMPLES),
         RSEM_count = expand(rsem_data + '{sample_uniq}/mouse_genome.genes.results', sample_uniq = uniq_SAMPLES), 
         RSEM_iso_count = expand(rsem_data + '{sample_uniq}/mouse_genome.isoforms.results', sample_uniq = uniq_SAMPLES), 
+        Tx_sorted = expand(rsem_data + '{sample_uniq}/mouse_genome.transcript.sorted.bam', sample_uniq = uniq_SAMPLES),
+        sorted = expand(rsem_data + '{sample_uniq}/mouse_genome.Aligned.out.sorted.bam', sample_uniq = uniq_SAMPLES),
 
     output:
         stats = stats_data + 'Stats.txt',
