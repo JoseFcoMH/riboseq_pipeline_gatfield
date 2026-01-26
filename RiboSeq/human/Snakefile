@@ -958,7 +958,7 @@ rule QC:
         trimmed_data = trimmed_data,
         rsem_data = rsem_data,
         stats_data = stats_data,
-        DB = ref_path + ref_version
+        DB = ref_path + ref_version,
         script = script
 
     envmodules:
