@@ -43,7 +43,7 @@ RSEM_path = config['RSEM_path']
 trimgalore = config['trimgalore']
 
 work_dir = config['work_dir']
-script = work_dir + 'scripts/'
+script = work_dir + 'script/'
 config_dir = work_dir + 'config/'
 raw_data = work_dir + 'raw_data/'
 umi_data = work_dir + 'umi_data/'
