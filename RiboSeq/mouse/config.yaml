@@ -73,6 +73,7 @@ STAR_refs_params: {
 
 # RSEM
 ref_version: 'Mmusculus.GRCm39.111'
+ref_path: '/data/databases/mouse/'
 ref_genome: '/data/databases/mouse/fasta/Mmusculus.GRCm39.111.dna.ensembl.fa'
 ref_GTF: '/data/databases/mouse/gtf/Mmusculus.GRCm39.111.sorted.gtf'
 RSEM_path: '/data/databases/RSEM/Mmusculus.GRCm39.111/'
