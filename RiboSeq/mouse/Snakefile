@@ -995,6 +995,7 @@ rule QC:
         rsem_data = rsem_data,
         stats_data = stats_data,
         DB = ref_path + ref_version
+        script = script
 
     envmodules:
         envmodules['rpfTools'],
@@ -1002,7 +1003,7 @@ rule QC:
 
     shell:
         """
-        bash {params.work_dir}QC.sh {wildcards.sample_uniq} {params.work_dir} {params.DB}
+        bash {params.work_dir}QC.sh {wildcards.sample_uniq} {params.work_dir} {params.DB} {params.script}
         """
 
 
