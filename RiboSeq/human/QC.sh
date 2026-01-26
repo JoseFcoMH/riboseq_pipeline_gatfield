@@ -17,6 +17,7 @@
 
 id=$1
 work_dir=$2
+DB=$3
 
 # work_dir='/data/vricci/SnakemakeTest/'
 # id='PF73_2611_1_001_R1'
@@ -421,7 +422,7 @@ done
 echo "Calculating gene and transcripts map types"
 
 # mapType_Tx.py for BAM with only Tx and not Gene|Tx
-GENEBED='/data/databases/human/Hsapiens.GRCh38.111.startStop.IDS.bed'
+GENEBED=${DB}.startStop.IDS.bed
 flagstat_split=${mapping_data}${id}/human_tRNA.Unmapped.out.mate1.split.flagstats
 barcodes_split=${mapping_data}${id}/human_tRNA.Unmapped.out.mate1.split.barcodes
 
@@ -433,7 +434,7 @@ cat $flagstat_split | while read line; do
     BAM=${work_dir}RSEM/${id}/${bc}/human_genome.Aligned.out.bam
     BAM_Tx=${work_dir}RSEM/${id}/${bc}/human_genome.Aligned.toTranscriptome.out.bam
 
-    samtools view $BAM_Tx | ${work_dir}script/mapType_Tx.py -b $GENEBED -c 100000 > $map_out
+    samtools view $BAM_Tx | mapType_Tx.py -b $GENEBED -c 100000 > $map_out
 done
 
 
