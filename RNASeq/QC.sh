@@ -140,11 +140,11 @@ BAM_Tx=${work_dir}RSEM/${id}/mouse_genome.Aligned.toTranscriptome.out.bam
 #readLengthDistribution.py $BAM > ${stats_data}${id}_mapped_readLenDist.dat
 # same results as ${stats_data}${id}_trimmed_readLenDist.dat
 
-bioawk=/home/vricci/miniconda3/bin/bioawk
+#bioawk=/home/vricci/miniconda3/bin/bioawk
 echo "   projected to mouse_Tx"
 
 #readLengthDistribution.py $BAM_Tx > ${stats_data}${id}_mappedTx_readLenDist.dat
-samtools view $BAM_Tx | $bioawk -c sam '{hist[length($seq)]++} END {for (l in hist) print l, hist[l]}' | sort -n -k1 > ${stats_data}${id}_mappedTx_readLenDist.dat
+samtools view $BAM_Tx | bioawk -c sam '{hist[length($seq)]++} END {for (l in hist) print l, hist[l]}' | sort -n -k1 > ${stats_data}${id}_mappedTx_readLenDist.dat
 
 
 ###############################################################################
@@ -171,19 +171,3 @@ total_expected_count_isoforms=$(cut -f5 $RSEM_isoforms | tail -n +2 | awk '{s+=$
 echo -e "${id}\t${bc}\texpected_count\t${total_expected_count_genes}" > $RSEM_out
 # echo -e "${id}\t${bc}\texpected_count\t${total_expected_count_isoforms}" >> $RSEM_out
 # both are the same value!
-
-# DONE - done to avoid re-running all pipeline!
-# cd /data/vricci/projects/Lisa/RNAseq_mESC_degron/Extra/RSEM
-# for id in $(ls | grep '[0-9].*$'); do 
-#     echo $id
-#     RSEM_out=/data/vricci/projects/Lisa/RNAseq_mESC_degron/Extra/stats/${id}_RSEM.dat
-#     RSEM_genes=${id}/mouse_genome.genes.results
-#     RSEM_isoforms=${id}/mouse_genome.isoforms.results
-
-#     total_expected_count_genes=$(cut -f5 $RSEM_genes | tail -n +2 | awk '{s+=$1}END{print s}')
-#     total_expected_count_isoforms=$(cut -f5 $RSEM_isoforms | tail -n +2 | awk '{s+=$1}END{print s}')
-
-#     echo -e "${id}\t${bc}\texpected_count\t${total_expected_count_genes}" > $RSEM_out
-
-
-# done
