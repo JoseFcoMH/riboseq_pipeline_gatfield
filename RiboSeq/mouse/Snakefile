@@ -48,7 +48,7 @@ consume = config['consume']
 fastx_toolkit = config['fastx_toolkit']
 
 work_dir = config['work_dir']
-script = work_dir + 'scripts/'
+script = work_dir + 'script/'
 config_dir = work_dir + 'config/'
 raw_data = work_dir + 'raw_data/'
 umi_data = work_dir + 'umi_data/'
