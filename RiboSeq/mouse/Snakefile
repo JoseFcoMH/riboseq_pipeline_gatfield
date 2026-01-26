@@ -37,6 +37,7 @@ STAR_refs_params = config['STAR_refs_params']
 ref_genome = config['ref_genome']
 ref_GTF = config['ref_GTF']
 ref_version = config['ref_version']
+ref_path = config['ref_path']
 RSEM_path = config['RSEM_path']
 
 trimgalore = config['trimgalore']
@@ -993,6 +994,7 @@ rule QC:
         trimmed_data = trimmed_data,
         rsem_data = rsem_data,
         stats_data = stats_data,
+        DB = ref_path + ref_version
 
     envmodules:
         envmodules['rpfTools'],
@@ -1000,7 +1002,7 @@ rule QC:
 
     shell:
         """
-        bash {params.work_dir}QC.sh {wildcards.sample_uniq} {params.work_dir}
+        bash {params.work_dir}QC.sh {wildcards.sample_uniq} {params.work_dir} {params.DB}
         """
 
 
