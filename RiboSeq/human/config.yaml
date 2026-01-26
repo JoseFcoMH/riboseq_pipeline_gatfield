@@ -70,6 +70,7 @@ STAR_refs_params: {
 
 # RSEM
 ref_version: 'Hsapiens.GRCh38.111'
+ref_path: '/data/databases/human/'
 ref_genome: '/data/databases/human/fasta/Hsapiens.GRCh38.111.dna.ensembl.fa'
 ref_GTF: '/data/databases/human/gtf/Hsapiens.GRCh38.111.sorted.gtf'
 RSEM_path: '/data/databases/RSEM/Hsapiens.GRCh38.111/'
