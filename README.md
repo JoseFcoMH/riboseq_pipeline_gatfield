@@ -11,7 +11,9 @@ and copying all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your projec
 
 `cp Snakemake_pipeline/RiboSeq/mouse/* /path/to/your/project`
 
-**Check the prequisites and edit the config.yaml**
+**Edit script/prepare_refs.sh**
+
+**Edit config.yaml**
 
 You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/snakemake) [`conda`](https://conda.io/docs/) environment:
 
@@ -23,9 +25,11 @@ You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/sna
 
 `conda activate snakepipe`
 
-`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # to make scripts executable from everywhere
+`chmod 755 -R <path/to/>Snakemake_pipeline/script` # make your scripts executable
 
-Then, you can download and prepare the reference files:
+`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # to make scripts available everywhere
+
+Then, you can prepare the reference files:
 
 `bash script/prepare_refs.sh`
 
@@ -44,17 +48,11 @@ To run the pipeline on a cluster (e.g. Curnagl cluster of UNIL), you need to ope
 If you need any help, please contact virginie.ricci@unil.ch.
 
 ##  Prerequisites:
-- [samtools](https://www.htslib.org/)
-- [STAR](https://github.com/alexdobin/STAR)
-- [cutadapt](https://cutadapt.readthedocs.io/en/stable/)
-- [bedtools](https://bedtools.readthedocs.io/en/latest/)
-- [UMI-tools](https://github.com/CGATOxford/UMI-tools)
-- [fastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
-- [Trim Galore](https://github.com/FelixKrueger/TrimGalore)
-- [seqtk](https://github.com/lh3/seqtk)
-- [Entrez-Direct](https://www.ncbi.nlm.nih.gov/books/NBK179288/)
-- Modify the software versions in `config.yaml` according to your conda environment
+- All the software and packages needed are listed in `env.yaml`
+- Modify the software versions in `config.yaml` (if needed)
+- Edit `script/prepare_refs.sh`
 - Edit `config.yaml` according to your dataset and reference files
+
 
 
 # Ribo-seq Snakemake pipeline
