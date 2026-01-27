@@ -39,7 +39,7 @@ And finally, you can run the pipeline:
 
 To run the pipeline on a cluster (e.g. Curnagl cluster of UNIL), you need to open a tmux session, activate your conda environment and run your snakemake command frontend. **Do not forget to create and edit a global profile and a workflow profile.**
 
-`tmux new-session -s snakepipe_session`
+`tmux new-session -s snakepipe_session` # `tmux attach-session -t snakepipe_session` to attach and `tmux detach` to detach
 
 `conda activate snakepipe`
 
