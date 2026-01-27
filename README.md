@@ -25,9 +25,9 @@ You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/sna
 
 `conda activate snakepipe`
 
-`chmod 755 -R <path/to/>Snakemake_pipeline/script` # make your scripts executable
+`chmod 755 -R <path/to/>Snakemake_pipeline/script` # make scripts executable
 
-`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # to make scripts available everywhere
+`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # make scripts available everywhere
 
 Then, you can prepare the reference files:
 
