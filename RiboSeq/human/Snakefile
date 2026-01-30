@@ -816,21 +816,21 @@ rule RSEM_DEPTH:
             rm ${{bgfile_norm}}
 
             ### genome
-            lib_depth=$(samtools view -c -F 260 {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.Aligned.out.sorted.bam)
+            lib_depth=$(samtools view -c -F 260 {params.RSEM_n}${{bc}}/human_genome.Aligned.out.sorted.bam)
             echo ${{lib_depth}}
             fractReads=1
             curShift=0
-            chromfile={params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.Aligned.chromLength.txt
+            chromfile={params.RSEM_n}${{bc}}/human_genome.Aligned.chromLength.txt
             
-            samtools view -H {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.Aligned.out.sorted.bam | grep "@SQ" | awk '{{gsub("SN:","",$2); gsub("LN:","",$3); print $2"\\t"$3}}' > ${{chromfile}}
+            samtools view -H {params.RSEM_n}${{bc}}/human_genome.Aligned.out.sorted.bam | grep "@SQ" | awk '{{gsub("SN:","",$2); gsub("LN:","",$3); print $2"\\t"$3}}' > ${{chromfile}}
 
-            bgfile={params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.Aligned.bg
-            bwfile={params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.Aligned.bw
-            bgfile_norm={params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.Aligned.NormByLibDepth.bg
-            bwfile_norm={params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.Aligned.NormByLibDepth.bw
+            bgfile={params.RSEM_n}${{bc}}/human_genome.Aligned.bg
+            bwfile={params.RSEM_n}${{bc}}/human_genome.Aligned.bw
+            bgfile_norm={params.RSEM_n}${{bc}}/human_genome.Aligned.NormByLibDepth.bg
+            bwfile_norm={params.RSEM_n}${{bc}}/human_genome.Aligned.NormByLibDepth.bw
 
                         
-            bedtools genomecov -ibam {params.RSEM_n}${{bc}}/{wildcards.sample_uniq}_${{bc}}.Aligned.out.sorted.bam -bg -split | LC_COLLATE=C sort -k1,1 -k2,2n > ${{bgfile}}
+            bedtools genomecov -ibam {params.RSEM_n}${{bc}}/human_genome.Aligned.out.sorted.bam -bg -split | LC_COLLATE=C sort -k1,1 -k2,2n > ${{bgfile}}
             bedGraphToBigWig ${{bgfile}} ${{chromfile}} ${{bwfile}}
 
             awk -v var="${{lib_depth}}" '{{ print $1 "\\t" $2 "\\t" $3 "\\t" ($4/ var) }}' ${{bgfile}} > ${{bgfile_norm}}
