@@ -29,7 +29,7 @@ Create and activate your [`Snakemake`](https://anaconda.org/bioconda/snakemake) 
 
 `chmod 755 -R <path/to/>Snakemake_pipeline/script` # make scripts executable
 
-`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # make scripts available everywhere
+`export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # make scripts available
 
 Prepare the reference files:
 
