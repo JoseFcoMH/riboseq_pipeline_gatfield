@@ -31,7 +31,7 @@ You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/sna
 
 Then, you can prepare the reference files:
 
-`bash script/prepare_refs.sh`
+`bash script/prepare_refs_[mouse/human].sh`
 
 And finally, you can run the pipeline:
 
