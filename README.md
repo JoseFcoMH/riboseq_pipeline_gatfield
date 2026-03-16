@@ -3,19 +3,19 @@ In the lab of David Gatfield, we developped pipelines to process and map Ribo-se
 The pipeline includes a Snakefile, a config.yaml, software commands, and R and Python scripts. 
 
 ##  How to run the pipeline:
-You can use the pipeline by cloning the repository:
+Clone the repository:
 
 `git clone https://github.com/gatfieldlab/Snakemake_pipeline.git`
 
-and copying all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your project directory:
+Copy all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your project directory:
 
 `cp Snakemake_pipeline/RiboSeq/mouse/* /path/to/your/project`
 
-`vi script/prepare_refs_[mouse/human].sh`
+Edit the config.yaml of the pipeline:
 
 `vi config.yaml`
 
-You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/snakemake) [`conda`](https://conda.io/docs/) environment:
+Create and activate your [`Snakemake`](https://anaconda.org/bioconda/snakemake) [`conda`](https://conda.io/docs/) environment:
 
 `cp Snakemake_pipeline/env.yaml /path/to/your/project`
 
@@ -29,21 +29,23 @@ You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/sna
 
 `export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # make scripts available everywhere
 
-Then, you can prepare the reference files:
+Prepare the reference files:
+
+`vi script/prepare_refs_[mouse/human].sh`
 
 `bash script/prepare_refs_[mouse/human].sh`
 
-And finally, you can run the pipeline:
+Run the pipeline:
 
 `snakemake --cores n`
 
-To run the pipeline on a cluster (e.g. Curnagl cluster of UNIL), you need to open a tmux session, activate your conda environment and run your snakemake command frontend. **Do not forget to create and edit a global profile and a workflow profile.**
+To run the pipeline on a cluster (e.g. Curnagl cluster of UNIL), you need to open a tmux session, activate your conda environment and run your snakemake command frontend. **Do not forget to create and edit a workflow profile.**
+
+`vi WorkFlowProfile/config.yaml`
 
 `tmux new-session -s snakepipe_session` # `tmux attach-session -t snakepipe_session` to attach and `tmux detach` to detach
 
 `conda activate snakepipe`
-
-`vi WorkFlowProfile/config.yaml`
 
 `snakemake --workflow-profile WorkFlowProfile/config.yaml --configfile config.yaml`
 
@@ -51,9 +53,10 @@ If you need any help, please contact virginie.ricci@unil.ch.
 
 ##  Prerequisites:
 - All the software needed are listed in `env.yaml`
-- Modify the software versions in `config.yaml` (if needed)
+- Edit `config.yaml`
 - Edit `script/prepare_refs_[mouse/human].sh`
 - Edit `config.yaml` according to your dataset and reference files
+- Edit `WorkFlowProfile/config.yaml` according to your cluster 
 
 
 
