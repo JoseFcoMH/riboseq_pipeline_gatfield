@@ -11,7 +11,7 @@ and copying all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your projec
 
 `cp Snakemake_pipeline/RiboSeq/mouse/* /path/to/your/project`
 
-**Edit script/prepare_refs.sh**
+**Edit script/prepare_refs_[mouse/human].sh**
 
 **Edit config.yaml**
 
@@ -50,7 +50,7 @@ If you need any help, please contact virginie.ricci@unil.ch.
 ##  Prerequisites:
 - All the software needed are listed in `env.yaml`
 - Modify the software versions in `config.yaml` (if needed)
-- Edit `script/prepare_refs[mouse/human].sh`
+- Edit `script/prepare_refs_[mouse/human].sh`
 - Edit `config.yaml` according to your dataset and reference files
 
 
