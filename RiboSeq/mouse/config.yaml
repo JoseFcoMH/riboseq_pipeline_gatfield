@@ -41,7 +41,7 @@ refs: [mouse_rRNA, human_rRNA, mouse_tRNA, mouse_cDNA, mouse_genome]
 # STAR
 STAR_refs_path: {
   "mouse_rRNA": "/data/databases/mouse/star/Mmusculus.GRCm39.111/all_rRNA_PreRibo/",
-  "human_rRNA": "/data/databases/human/star/Hsapiens.GRCh38.111/all_tRNA/",
+  "human_rRNA": "/data/databases/human/star/Hsapiens.GRCh38.111/all_rRNA_PreRibo/",
   "mouse_tRNA": "/data/databases/mouse/star/Mmusculus.GRCm39.111/all_tRNA/",
   "mouse_cDNA": "/data/databases/mouse/star/Mmusculus.GRCm39.111/cDNA/",
   "mouse_genome": "/data/databases/mouse/star/Mmusculus.GRCm39.111/"
