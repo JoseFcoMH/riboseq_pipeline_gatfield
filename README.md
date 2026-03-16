@@ -21,7 +21,9 @@ Create and activate your [`Snakemake`](https://anaconda.org/bioconda/snakemake) 
 
 `cd /path/to/your/project`
 
-`conda env create -f env.yaml --prefix snakepipe` # if needed: conda rename -p /path/to/snakepipe snakepipe
+`conda env create -f env.yaml --prefix snakepipe`
+
+`conda rename -p /path/to/snakepipe snakepipe` # 
 
 `conda activate snakepipe`
 
