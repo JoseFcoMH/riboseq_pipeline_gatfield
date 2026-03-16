@@ -43,7 +43,7 @@ To run the pipeline on a cluster (e.g. Curnagl cluster of UNIL), you need to ope
 
 `conda activate snakepipe`
 
-`snakemake --workflow-profile $workflow_profile --configfile $config` # if needed, you can add a global profile (--profile $global_profile )
+`snakemake --workflow-profile WorkFlowProfile/config.yaml --configfile config.yaml`
 
 If you need any help, please contact virginie.ricci@unil.ch.
 
