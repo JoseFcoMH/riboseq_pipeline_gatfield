@@ -11,9 +11,9 @@ and copying all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your projec
 
 `cp Snakemake_pipeline/RiboSeq/mouse/* /path/to/your/project`
 
-**Edit script/prepare_refs_[mouse/human].sh**
+`vi script/prepare_refs_[mouse/human].sh`
 
-**Edit config.yaml**
+`vi config.yaml`
 
 You can create and activate your [`Snakemake`](https://anaconda.org/bioconda/snakemake) [`conda`](https://conda.io/docs/) environment:
 
@@ -42,6 +42,8 @@ To run the pipeline on a cluster (e.g. Curnagl cluster of UNIL), you need to ope
 `tmux new-session -s snakepipe_session` # `tmux attach-session -t snakepipe_session` to attach and `tmux detach` to detach
 
 `conda activate snakepipe`
+
+`vi WorkFlowProfile/config.yaml`
 
 `snakemake --workflow-profile WorkFlowProfile/config.yaml --configfile config.yaml`
 
