@@ -34,18 +34,17 @@ export PATH=$PATH:<path/to/>Snakemake_pipeline/script
 # convert_ensembl_ids.py and Get_rRNA_tRNA.R
 
 
-GRC=GRCm39
-organism=Mmusculus
-folder_ncbi=mus_musculus
-file_ncbi=Mus_musculus
+GRC=GRCh38
+organism=Hsapiens
+folder_ncbi=homo_sapiens
+file_ncbi=Homo_sapiens
 cur_release=111
-path_ref=/data/databases/mouse/
+path_ref=/data/databases/human/
 
 
-#tRNA_link=https://gtrnadb.ucsc.edu/genomes/eukaryota/Mmusc39/mm39-tRNAs.fa # previous link, same file
-tRNA_link=https://gtrnadb.org/genomes/eukaryota/Mmusc39/mm39-tRNAs.fa 
+tRNA_link=https://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/hg38-tRNAs.fa
 
-preribo_45S='NR_046233.2'
+preribo_45S='NR_046235.3'
 ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT 
 ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT 
 
