@@ -15,7 +15,7 @@ Edit the config.yaml of the pipeline:
 
 `vi config.yaml`
 
-Create and activate your [`Snakemake`](https://anaconda.org/bioconda/snakemake) [`conda`](https://conda.io/docs/) environment:
+Create your [`Snakemake`](https://anaconda.org/bioconda/snakemake) [`conda`](https://conda.io/docs/) environment:
 
 `cp Snakemake_pipeline/env.yaml /path/to/your/project`
 
@@ -25,7 +25,7 @@ Create and activate your [`Snakemake`](https://anaconda.org/bioconda/snakemake) 
 
 `conda rename -p /path/to/snakepipe snakepipe` # if needed
 
-`conda activate snakepipe`
+Make scripts executable from anywhere:
 
 `chmod 755 -R <path/to/>Snakemake_pipeline/script` # make scripts executable
 
