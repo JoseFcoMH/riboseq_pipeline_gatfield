@@ -57,8 +57,7 @@ If you need any help, please contact virginie.ricci@unil.ch.
 - All the software needed are listed in `env.yaml`
 - Edit `config.yaml`
 - Edit `script/prepare_refs_[mouse/human].sh`
-- Edit `config.yaml` according to your dataset and reference files
-- Edit `WorkFlowProfile/config.yaml` according to your cluster 
+- Edit `WorkFlowProfile/config.yaml` if you are using a cluster
 
 
 
