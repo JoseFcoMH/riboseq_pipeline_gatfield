@@ -53,7 +53,7 @@ To run the pipeline on a cluster (e.g. Curnagl cluster of UNIL), you need to ope
 
 If you need any help, please contact virginie.ricci@unil.ch.
 
-##  Prerequisites:
+##  Reminder:
 - All the software needed are listed in `env.yaml`
 - Edit `config.yaml`
 - Edit `script/prepare_refs_[mouse/human].sh`
