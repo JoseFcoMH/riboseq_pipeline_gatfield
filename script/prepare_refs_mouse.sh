@@ -140,7 +140,7 @@ done
 echo ${temp_files} | xargs -P 1 -I '{}' bash -c 'rm {}'
 
 IDS=${path_ref}${organism}.${GRC}.${cur_release}.startStop.IDS.bed
-python annotateTranscripts.py -g ${cur_gtf_sorted} -t CDS > $IDS
+python ${path_script}annotateTranscripts.py -g ${cur_gtf_sorted} -t CDS > $IDS
 
 
 # GFF
@@ -159,7 +159,7 @@ fi
 
 ### rRNA and tRNA
 echo Get rRNA and tRNA
-Rscript Get_rRNA_tRNA.R $organism $GRC $cur_release ${path_ref}fasta/
+Rscript ${path_script}Get_rRNA_tRNA.R $organism $GRC $cur_release ${path_ref}fasta/
 
 # rRNA + mt-rRNA
 cat ${path_ref}fasta/${organism}.${GRC}.${cur_release}.rrna.ensembl.fa ${path_ref}fasta/${organism}.${GRC}.${cur_release}.mt-rrna.ensembl.fa > ${path_ref}fasta/${organism}.${GRC}.${cur_release}.all-rrna.ensembl.fa
