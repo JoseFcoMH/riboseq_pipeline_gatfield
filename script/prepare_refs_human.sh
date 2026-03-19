@@ -176,7 +176,7 @@ cat ${path_ref}fasta/${organism}.${GRC}.${cur_release}.trna.ensembl.fa ${path_re
 
 # 45S pre-ribosomal rRNA included in human rRNA
 echo Are you sure the huamn 45S pre-ribosomal rRNA is $preribo_45S ? This should be manually checked!
-# https://www.ncbi.nlm.nih.gov/nuccore/NR_046233.2
+# https://www.ncbi.nlm.nih.gov/nuccore/NR_046235.3
 PreRibo_45S_fa=${path_ref}fasta/${organism}.${GRC}.${cur_release}.PreRibo_45S.fa
 touch $PreRibo_45S_fa
 efetch -db nuccore -id $preribo_45S -format fasta > $PreRibo_45S_fa
