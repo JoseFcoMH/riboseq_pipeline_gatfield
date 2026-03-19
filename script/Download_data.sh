@@ -17,14 +17,20 @@
 # If not, see <https://www.gnu.org/licenses/>.
 ### LICENCE 
 
-path_home='/work/FAC/FBM/CIG/dgatfiel/default/vricci/Lisa/DENR_woCrossLink_Ribo/'
+### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT 
+### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT 
+path_home='/path/to/project/' # don't forget the '/' at the end
+
+### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT 
+### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT ### TO EDIT 
+
 raw_data=${path_home}raw_data/
 
 mkdir -p $raw_data
 
 cd $path_home
 
-
+# using UHTS-LIMS of Lausanne Genomic Technologies Facility
 for RunID in 498 503 508 549 557; do
         while read -r line; do
                 echo $line
@@ -43,5 +49,5 @@ for RunID in 498 503 508 549 557; do
                         echo 'Downloading...'
                         wget $line -O ${raw_data}${FQ}
                 fi
-        done < LIMS_samples.links_${RunID}
+        done < LIMS_samples.links_${RunID} # including the links for downloads
 done
