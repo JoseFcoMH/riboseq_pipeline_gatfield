@@ -70,7 +70,7 @@ GFF_OUTPUT=${organism}.${GRC}.${cur_release}.gff3
 
 STAR_DIR=${path_ref}star/${organism}.${GRC}.${cur_release}
 
-cur_log_file=${PWD}/fetch_ensembl_rel-${cur_release}.log
+cur_log_file=${PWD}/fetch_ensembl_${organism}_rel-${cur_release}.log
 
 # checks
 samtools_ver=$(samtools --version | head -1 | cut -d' ' -f2)
