@@ -231,7 +231,6 @@ cur_dna_output=${path_ref}fasta/${organism}.${GRC}.${cur_release}.dna.ensembl.fa
 STAR --runMode genomeGenerate --runThreadN 24 --genomeDir $cur_star_dir \
      --genomeFastaFiles $cur_dna_output --sjdbGTFfile $cur_gtf_output \
      --sjdbOverhang 100
- cat ${STAR_DIR}/Log.out >> ${cur_log_file} && rm ${STAR_DIR}/Log.out
 
 
 
