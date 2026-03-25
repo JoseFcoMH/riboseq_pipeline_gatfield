@@ -154,7 +154,7 @@ rule all:
 ##########################################################################################################################
 rule combine_fastq:
     input: 
-        db = work_dir + prefix + '_samples.db',
+        db = raw_data + prefix + '_data_uniq.txt',
         gz = expand(raw_data + '{sample}.fastq.gz', sample=SAMPLES),
 
     output:
