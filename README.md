@@ -74,7 +74,9 @@ If you need any help, please contact virginie.ricci@unil.ch.
 - All the software needed are listed in `env.yaml`
 - Edit `config.yaml`
 - Edit `script/prepare_refs_[mouse/human].sh`
+- Install BBTools to get demuxbyname.sh
 - Edit `WorkFlowProfile/config.yaml` if you are using a cluster
+
 
 
 
