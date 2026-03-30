@@ -37,7 +37,7 @@ Prepare the reference files:
 
 `bash script/prepare_refs_[mouse/human].sh`
 
-Install BBTools (https://github.com/bbushnell/BBTools) to get demuxbyname.sh:
+Install [`BBTools`](https://github.com/bbushnell/BBTools) to get demuxbyname.sh:
 
 `wget https://sourceforge.net/projects/bbmap/files/latest/download -O BBTools.tar.gz`
 
