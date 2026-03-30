@@ -13,6 +13,7 @@ Copy all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your project direc
 
 `cd /path/to/your/project`
 
+___
 Edit the config.yaml of the pipeline:
 
 `vi config.yaml`
