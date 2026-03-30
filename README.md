@@ -7,6 +7,7 @@ Clone the repository:
 
 `git clone https://github.com/gatfieldlab/Snakemake_pipeline.git`
 
+___
 Copy all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your project directory:
 
 `cp Snakemake_pipeline/RiboSeq/mouse/* /path/to/your/project`
@@ -18,6 +19,7 @@ Edit the config.yaml of the pipeline:
 
 `vi config.yaml`
 
+___
 Create your [`Snakemake`](https://anaconda.org/bioconda/snakemake) [`conda`](https://conda.io/docs/) environment:
 
 `cp env.yaml /path/to/your/project`
@@ -26,18 +28,21 @@ Create your [`Snakemake`](https://anaconda.org/bioconda/snakemake) [`conda`](htt
 
 `conda rename -p /path/to/snakepipe snakepipe` # if needed
 
+___
 Make scripts executable from anywhere:
 
 `chmod 755 -R <path/to/>Snakemake_pipeline/script` # make scripts executable
 
 `export PATH=$PATH:<path/to/>Snakemake_pipeline/script` # make scripts available
 
+___
 Prepare the reference files:
 
 `vi script/prepare_refs_[mouse/human].sh`
 
 `bash script/prepare_refs_[mouse/human].sh`
 
+___
 Install [`BBTools`](https://github.com/bbushnell/BBTools) to get demuxbyname.sh:
 
 `wget https://sourceforge.net/projects/bbmap/files/latest/download -O BBTools.tar.gz`
@@ -48,6 +53,7 @@ Install [`BBTools`](https://github.com/bbushnell/BBTools) to get demuxbyname.sh:
 
 `./bbversion.sh`
 
+___
 Run the pipeline:
 
 `snakemake --cores n`
