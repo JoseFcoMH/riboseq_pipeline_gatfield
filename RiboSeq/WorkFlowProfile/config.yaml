@@ -1,0 +1,39 @@
+executor: "slurm"
+printshellcmds: True
+use-conda: True
+jobs: 400
+
+
+default-resources:
+  slurm_account: "dgatfiel_default"
+  slurm_partition: "cpu"
+  tasks: 1
+  cpus_per_task: 10
+  mem_mb_per_cpu: "20G"
+  runtime: "1h"
+  
+
+set-resources:
+  trim_galore:
+    tasks: 8
+
+  RSEM_ref:
+    runtime: "6h"
+    tasks: 12
+    mem_mb_per_cpu: "10G"
+
+  STAR_RSEM:
+    runtime: "6h"
+    tasks: 8
+    mem_mb_per_cpu: "10G"
+
+  RSEM_count:
+    runtime: "4h"
+    tasks: 8
+
+  RSEM_DEPTH:
+    runtime: "6h"
+
+  stats:
+    tasks: 10
+
