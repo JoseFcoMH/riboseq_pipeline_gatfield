@@ -7,7 +7,7 @@ Clone the repository:
 
 `git clone https://github.com/gatfieldlab/Snakemake_pipeline.git`
 
-___
+---
 Copy all files present in [`RiboSeq/mouse`](RiboSeq/mouse) in your project directory:
 
 `cp Snakemake_pipeline/RiboSeq/mouse/* /path/to/your/project`
