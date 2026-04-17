@@ -5,53 +5,47 @@ envmodules:
   bowtie2: bowtie2/2.3.5
   STAR: STAR/2.7.11b
   cutadapt: cutadapt/3.5
-  chip-seq: chip-seq/1.5.5
+  # chip-seq: chip-seq/1.5.5
   bedtools: bedtools/2.28.0
   UMI-tools: UMI-tools/1.0.0git
-  pipeline: pipeline/0.3.2
-  rpfTools: rpfTools/1.2.0
+  # rpfTools: rpfTools/1.2.0
   fastqc: fastqc/0.12.1
   trimgalore: TrimGalore/0.6.10
-  UCSC: ucsc-tools/dec-10-2019
+  # UCSC: ucsc-tools/dec-10-2019
   DeepTools: deeptools/3.5.6/
 
+work_dir: "/path/to/your/project/" # don't forget the last '/'
+prefix: "NovaSeq"
 
-
-work_dir: '/path/to/your/project/' # don't forget the last '/'
-prefix: 'NovaSeq'
-
-
-trimgalore: '--quality 24 --phred33 --length 30 --fastqc'
-umi_whitelist: '--extract-method string --bc-pattern NNNNNNNNCCCCC --3prime --log2stderr'
-umi_extract : '--extract-method string --bc-pattern NNNNNNNNCCCCC --3prime --filter-cell-barcode --error-correct-cell --log2stderr'
-umi_dedup : '--method=directional --per-cell --read-length'
-consume: {
-  "PF":"28 37",
-  "PD":"45 70",
-  "PT":"23 62",
-  "P3":"75 100"
-  } # value + 2 (2nt are trimmed after this step)
-fastx_toolkit: '-Q33 -q 24 -p 90 -v'
-
+trimgalore: "--quality 24 --phred33 --length 30 --fastqc"
+umi_whitelist: "--extract-method string --bc-pattern NNNNNNNNCCCCC --3prime --log2stderr"
+umi_extract: "--extract-method string --bc-pattern NNNNNNNNCCCCC --3prime --filter-cell-barcode --error-correct-cell --log2stderr"
+umi_dedup: "--method=directional --per-cell --read-length"
+consume: { "PF": "28 37", "PD": "45 70", "PT": "23 62", "P3": "75 100" } # value + 2 (2nt are trimmed after this step)
+fastx_toolkit: "-Q33 -q 24 -p 90 -v"
 
 # Reads mapping to the following references in that order:
 refs: [human_rRNA, human_tRNA, human_cDNA, human_genome]
 
 # STAR
-STAR_refs_path: {
-  "human_rRNA": "/data/databases/human/star/Hsapiens.GRCh38.111/all_rRNA_PreRibo/",
-  "human_tRNA": "/data/databases/human/star/Hsapiens.GRCh38.111/all_tRNA/",
-  "human_cDNA": "/data/databases/human/star/Hsapiens.GRCh38.111/cDNA/",
-  "human_genome": "/data/databases/human/star/Hsapiens.GRCh38.111/"
-}
+STAR_refs_path:
+  {
+    "human_rRNA": "/data/databases/human/star/Hsapiens.GRCh38.111/all_rRNA_PreRibo/",
+    "human_tRNA": "/data/databases/human/star/Hsapiens.GRCh38.111/all_tRNA/",
+    "human_cDNA": "/data/databases/human/star/Hsapiens.GRCh38.111/cDNA/",
+    "human_genome": "/data/databases/human/star/Hsapiens.GRCh38.111/",
+  }
 
 # Consider changing the value of '--outSAMmultNmax' to allow multimapping
-STAR_params: 
-  basic_params: &basic_params "--seedSearchStartLmax 28 --outSAMmultNmax 1 --outSAMtype BAM SortedByCoordinate Unsorted \
+STAR_params:
+  basic_params:
+    &basic_params "--seedSearchStartLmax 28 --outSAMmultNmax 1 --outSAMtype BAM SortedByCoordinate Unsorted \
     --limitBAMsortRAM 15000000000 --outReadsUnmapped Fastx"
-  other_params: &other_params "--seedSearchStartLmax 28 --outSAMmultNmax 20 --outSAMtype BAM SortedByCoordinate Unsorted \
+  other_params:
+    &other_params "--seedSearchStartLmax 28 --outSAMmultNmax 20 --outSAMtype BAM SortedByCoordinate Unsorted \
     --limitBAMsortRAM 15000000000 --outReadsUnmapped Fastx"
-  genome_params: &genome_params "--seedSearchStartLmax 28 --outSAMmultNmax 1 --outSAMtype BAM SortedByCoordinate Unsorted \
+  genome_params:
+    &genome_params "--seedSearchStartLmax 28 --outSAMmultNmax 1 --outSAMtype BAM SortedByCoordinate Unsorted \
     --limitBAMsortRAM 15000000000 --outReadsUnmapped Fastx \
     --alignSJDBoverhangMin 1 --alignIntronMax 1000000 --outFilterType BySJout --alignSJoverhangMin 8 \
     --sjdbGTFfile /data/databases/human/gtf/Hsapiens.GRCh38.111.sorted.gtf"
@@ -60,17 +54,17 @@ STAR_params:
 # human_cDNA after human_tRNA (results in mapping_data/)
 # human_genome after human_tRNA (results in mapping_data/)
 # human_genome after human_tRNA WITH SPECIFIC RSEM PARAMETERS (results in RSEM/STAR/)
-STAR_refs_params: {
-  "human_rRNA": *basic_params,
-  "human_tRNA": *basic_params,
-  "human_cDNA": *basic_params,
-  "human_genome": *genome_params
-}
-
+STAR_refs_params:
+  {
+    "human_rRNA": *basic_params,
+    "human_tRNA": *basic_params,
+    "human_cDNA": *basic_params,
+    "human_genome": *genome_params,
+  }
 
 # RSEM
-ref_version: 'Hsapiens.GRCh38.111'
-ref_path: '/data/databases/human/'
-ref_genome: '/data/databases/human/fasta/Hsapiens.GRCh38.111.dna.ensembl.fa'
-ref_GTF: '/data/databases/human/gtf/Hsapiens.GRCh38.111.sorted.gtf'
-RSEM_path: '/data/databases/RSEM/Hsapiens.GRCh38.111/'
+ref_version: "Hsapiens.GRCh38.111"
+ref_path: "/data/databases/human/"
+ref_genome: "/data/databases/human/fasta/Hsapiens.GRCh38.111.dna.ensembl.fa"
+ref_GTF: "/data/databases/human/gtf/Hsapiens.GRCh38.111.sorted.gtf"
+RSEM_path: "/data/databases/RSEM/Hsapiens.GRCh38.111/"
