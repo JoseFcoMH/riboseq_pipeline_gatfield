@@ -22,15 +22,17 @@
 module load miniconda/latest
 conda activate snakepipe
 
-path_script=$(cd -- "$(dirname -- "$0")" && pwd)
+path_script=/home/vzl634/datadir/riboseq_pipeline_gatfield/script/
 chmod 755 -R $path_script
 export PATH=$PATH:$path_script
 # convert_ensembl_ids.py and Get_rRNA_tRNA.R
 
-GRC=GRCh38k
+GRC=GRCh38
+organism=Hsapiens
+folder_ncbi=homo_sapiens
 file_ncbi=Homo_sapiens
 cur_release=111
-path_ref=/home/vzl634/datadir/riboseq_reference_database/
+path_ref=/home/vzl634/datadir/riboseq_reference_database/human/
 
 tRNA_link=https://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/hg38-tRNAs.fa
 
@@ -192,6 +194,7 @@ mkdir -p ${cur_star_dir}
 cur_cdna_output=${path_ref}fasta/${organism}.${GRC}.${cur_release}.cdna.ensembl.fa
 STAR --runMode genomeGenerate --runThreadN 24 --genomeDir $cur_star_dir \
   --genomeFastaFiles $cur_cdna_output \
+  --limitGenomeGenerateRAM 143859035061 \
   --genomeSAindexNbases 12
 
 echo Building ${organism} STAR genome database for release-${cur_release}

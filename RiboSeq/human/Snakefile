@@ -28,7 +28,7 @@ import subprocess
 
 configfile: 'config.yaml'
 
-envmodules = config['envmodules']
+condas = config['conda_envs']
 
 prefix = config['prefix']
 refs = config['refs']
@@ -182,8 +182,8 @@ rule raw_fastqc:
     output:
         fastqc = raw_data + '{sample_uniq}_fastqc.html',
 
-    envmodules:
-        envmodules['fastqc'],
+    conda:
+        condas['ribosnake'],
 
     shell:
         """
@@ -206,8 +206,8 @@ rule trim_galore:
         trimgalore = trimgalore,
         
 
-    envmodules:
-        envmodules['trimgalore']
+    conda:
+        condas['ribosnake']
 
     shell:
         """
@@ -230,8 +230,8 @@ rule barcode_whitelist:
     params:
         umi_whitelist = umi_whitelist,
 
-    envmodules:
-        envmodules['UMI-tools'],
+    conda:
+        condas['ribosnake'],
 
     shell:
         """
@@ -267,11 +267,8 @@ rule preprocess:
         clean_fastq = filtered_data + '{sample_uniq}_clean.fastq',
         final_fastq = filtered_data + '{sample_uniq}_final.fastq',
 
-    envmodules:
-        envmodules['fastqc'],
-        envmodules['UMI-tools'],
-        envmodules['pipeline'],
-        envmodules['fastx_toolkit'],
+    conda:
+        condas['ribosnake'],
 
     shell:
         """
@@ -293,8 +290,8 @@ rule final_fastqc:
     output:
         final_fastqc = filtered_data + '{sample_uniq}_final_fastqc.html',
 
-    envmodules:
-        envmodules['fastqc'],
+    conda:
+        condas['ribosnake'],
 
     shell:
         """
@@ -329,8 +326,8 @@ rule mapping_human_rRNA:
         ref_params = STAR_refs_params['human_rRNA'],
         
 
-    envmodules:
-        envmodules['STAR']
+    conda:
+        condas['ribosnake']
 
     shell:
         """
@@ -365,8 +362,8 @@ rule mapping_human_tRNA:
         ref_params = STAR_refs_params['human_tRNA'],
         
 
-    envmodules:
-        envmodules['STAR']
+    conda:
+        condas['ribosnake']
 
     shell:
         """
@@ -400,8 +397,8 @@ rule mapping_human_cDNA:
         ref_path = STAR_refs_path['human_cDNA'],
         ref_params = STAR_refs_params['human_cDNA'],
 
-    envmodules:
-        envmodules['STAR']
+    conda:
+        condas['ribosnake']
 
     shell:
         """
@@ -437,8 +434,8 @@ rule mapping_human_genome:
         ref_path = STAR_refs_path['human_genome'],
         ref_params = STAR_refs_params['human_genome'],
 
-    envmodules:
-        envmodules['STAR']
+    conda:
+        condas['ribosnake']
 
     shell:
         """
@@ -502,8 +499,8 @@ rule RSEM_ref:
         ref_version = ref_version,
         RSEM_path = RSEM_path,
 
-    envmodules:
-        envmodules['STAR']
+    conda:
+        condas['ribosnake']
 
     shell:
         """
@@ -535,11 +532,8 @@ rule STAR_RSEM:
         RSEM_path = RSEM_path,
         umi_dedup = umi_dedup,
 
-    envmodules:
-        envmodules['STAR'],
-        envmodules['pipeline'],
-        envmodules['samtools'],
-        envmodules['UMI-tools'],
+    conda:
+        condas['ribosnake'],
 
     shell:
         """
@@ -606,11 +600,8 @@ rule DEDUP_RSEM:
         RSEM_path = RSEM_path,
         umi_dedup = umi_dedup,
 
-    envmodules:
-        envmodules['STAR'],
-        envmodules['pipeline'],
-        envmodules['samtools'],
-        envmodules['UMI-tools'],
+    conda:
+        condas['ribosnake'],
 
     shell:
         """
@@ -657,11 +648,8 @@ rule FORWARD_RSEM:
         RSEM_path = RSEM_path,
         umi_dedup = umi_dedup,
 
-    envmodules:
-        envmodules['STAR'],
-        envmodules['pipeline'],
-        envmodules['samtools'],
-        envmodules['UMI-tools'],
+    conda:
+        condas['ribosnake'],
 
     shell:
         """
@@ -707,11 +695,8 @@ rule RSEM:
         RSEM_path = RSEM_path,
         umi_dedup = umi_dedup,
 
-    envmodules:
-        envmodules['STAR'],
-        envmodules['pipeline'],
-        envmodules['samtools'],
-        envmodules['UMI-tools'],
+    conda:
+        condas['ribosnake'],
 
     shell:
         """
@@ -759,15 +744,8 @@ rule RSEM_DEPTH:
         RSEM_path = RSEM_path,
         umi_dedup = umi_dedup,
 
-    envmodules:
-        envmodules['STAR'],
-        envmodules['pipeline'],
-        envmodules['samtools'],
-        envmodules['UMI-tools'],
-        envmodules['rpfTools'],
-        envmodules['UCSC'],
-        envmodules['DeepTools'],
-        envmodules['bedtools'],
+    conda:
+        condas['ribosnake'],
 
     shell:
         """
@@ -961,9 +939,8 @@ rule QC:
         DB = ref_path + ref_version,
         script = script
 
-    envmodules:
-        envmodules['rpfTools'],
-        envmodules['R'],
+    conda:
+        condas['ribosnake'],
 
     shell:
         """
@@ -1005,8 +982,8 @@ rule QC_plot:
         rsem_data = rsem_data,
         stats_data = stats_data,
 
-    envmodules:
-        envmodules['R'],
+    conda:
+        condas['ribosnake'],
 
     shell:
         """
