@@ -1,7 +1,7 @@
 conda_envs:
   ribosnake: "snakepipe"
 
-work_dir: "/path/to/your/project/" # don't forget the last '/'
+work_dir: "/home/vzl634/datadir/someproject/gatfield_pipeline/" # don't forget the last '/'
 prefix: "NovaSeq"
 
 trimgalore: "--quality 24 --phred33 --length 30 --fastqc"
@@ -17,10 +17,10 @@ refs: [human_rRNA, human_tRNA, human_cDNA, human_genome]
 # STAR
 STAR_refs_path:
   {
-    "human_rRNA": "/data/databases/human/star/Hsapiens.GRCh38.111/all_rRNA_PreRibo/",
-    "human_tRNA": "/data/databases/human/star/Hsapiens.GRCh38.111/all_tRNA/",
-    "human_cDNA": "/data/databases/human/star/Hsapiens.GRCh38.111/cDNA/",
-    "human_genome": "/data/databases/human/star/Hsapiens.GRCh38.111/",
+    "human_rRNA": "/home/vzl634/datadir/riboseq_reference_database/human/star/Hsapiens.GRCh38.111/all_rRNA_PreRibo/",
+    "human_tRNA": "/home/vzl634/datadir/riboseq_reference_database/human/star/Hsapiens.GRCh38.111/all_tRNA/",
+    "human_cDNA": "/home/vzl634/datadir/riboseq_reference_database/human/star/Hsapiens.GRCh38.111/cDNA/",
+    "human_genome": "/home/vzl634/datadir/riboseq_reference_database/human/star/Hsapiens.GRCh38.111/",
   }
 
 # Consider changing the value of '--outSAMmultNmax' to allow multimapping
@@ -35,7 +35,7 @@ STAR_params:
     &genome_params "--seedSearchStartLmax 28 --outSAMmultNmax 1 --outSAMtype BAM SortedByCoordinate Unsorted \
     --limitBAMsortRAM 15000000000 --outReadsUnmapped Fastx \
     --alignSJDBoverhangMin 1 --alignIntronMax 1000000 --outFilterType BySJout --alignSJoverhangMin 8 \
-    --sjdbGTFfile /data/databases/human/gtf/Hsapiens.GRCh38.111.sorted.gtf"
+    --sjdbGTFfile /home/vzl634/datadir/riboseq_reference_database/human/gtf/Hsapiens.GRCh38.111.sorted.gtf"
 
 # currently: STAR mapping to human_rRNA, human_tRNA,
 # human_cDNA after human_tRNA (results in mapping_data/)
@@ -51,7 +51,7 @@ STAR_refs_params:
 
 # RSEM
 ref_version: "Hsapiens.GRCh38.111"
-ref_path: "/data/databases/human/"
-ref_genome: "/data/databases/human/fasta/Hsapiens.GRCh38.111.dna.ensembl.fa"
-ref_GTF: "/data/databases/human/gtf/Hsapiens.GRCh38.111.sorted.gtf"
-RSEM_path: "/data/databases/RSEM/Hsapiens.GRCh38.111/"
+ref_path: "/home/vzl634/datadir/riboseq_reference_database/human/"
+ref_genome: "/home/vzl634/datadir/riboseq_reference_database/human/fasta/Hsapiens.GRCh38.111.dna.ensembl.fa"
+ref_GTF: "/home/vzl634/datadir/riboseq_reference_database/human/gtf/Hsapiens.GRCh38.111.sorted.gtf"
+RSEM_path: "/home/vzl634/datadir/riboseq_reference_database/RSEM/Hsapiens.GRCh38.111/"

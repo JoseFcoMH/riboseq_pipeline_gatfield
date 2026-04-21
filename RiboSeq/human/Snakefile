@@ -48,7 +48,6 @@ consume = config['consume']
 fastx_toolkit = config['fastx_toolkit']
 
 work_dir = config['work_dir']
-script = work_dir + 'script/'
 config_dir = work_dir + 'config/'
 raw_data = work_dir + 'raw_data/'
 umi_data = work_dir + 'umi_data/'
@@ -163,6 +162,9 @@ rule combine_fastq:
         sample_uniq = uniq_SAMPLES,
         raw_data = raw_data,
 
+    resources:
+        cpus_per_task=1,
+
     shell:
         """
         for x in {params.sample_uniq}; do
@@ -185,6 +187,9 @@ rule raw_fastqc:
     conda:
         condas['ribosnake'],
 
+    resources:
+        cpus_per_task=1,
+
     shell:
         """
         fastqc --noextract {input.gz}
@@ -205,13 +210,15 @@ rule trim_galore:
         trimmed_data = trimmed_data,
         trimgalore = trimgalore,
         
-
     conda:
-        condas['ribosnake']
+        condas['ribosnake'],
+
+    resources:
+        cpus_per_task=8,
 
     shell:
         """
-        trim_galore --cores 8 --output_dir {params.trimmed_data} {params.trimgalore} {input.gz} 1> {output.trimmed_log} 2>&1
+        trim_galore --cores {resources.cpus_per_task} --output_dir {params.trimmed_data} {params.trimgalore} {input.gz} 1> {output.trimmed_log} 2>&1
         """
 
 
@@ -232,6 +239,9 @@ rule barcode_whitelist:
 
     conda:
         condas['ribosnake'],
+
+    resources:
+        cpus_per_task=1,
 
     shell:
         """
@@ -270,6 +280,9 @@ rule preprocess:
     conda:
         condas['ribosnake'],
 
+    resources:
+        cpus_per_task=4,
+
     shell:
         """
         umi_tools extract -I {input.trimmed_gz} --whitelist {input.whitelist} {params.umi_extract} 2> {output.extr_log} | \\
@@ -292,6 +305,9 @@ rule final_fastqc:
 
     conda:
         condas['ribosnake'],
+
+    resources:
+        cpus_per_task=1,
 
     shell:
         """
@@ -327,11 +343,15 @@ rule mapping_human_rRNA:
         
 
     conda:
-        condas['ribosnake']
+        condas['ribosnake'],
+
+    resources:
+        cpus_per_task=12,
+        mem_mb=48000,
 
     shell:
         """
-        STAR --runThreadN 12 --twopassMode Basic \\
+        STAR --runThreadN {resources.cpus_per_task} --twopassMode Basic \\
             --genomeDir {params.ref_path} \\
             --readFilesIn {input.final_fastq_gz} \\
             --readFilesCommand zcat \\
@@ -361,13 +381,16 @@ rule mapping_human_tRNA:
         ref_path = STAR_refs_path['human_tRNA'],
         ref_params = STAR_refs_params['human_tRNA'],
         
-
     conda:
-        condas['ribosnake']
+        condas['ribosnake'],
+
+    resources:
+        cpus_per_task=12,
+        mem_mb=128000,
 
     shell:
         """
-        STAR --runThreadN 12 --twopassMode Basic \\
+        STAR --runThreadN {resources.cpus_per_task} --twopassMode Basic \\
             --genomeDir {params.ref_path} \\
             --readFilesIn {input.unmapped} \\
             --outFileNamePrefix {params.mapping_data}/STAR/{wildcards.sample_uniq}/human_tRNA. \\
@@ -398,11 +421,15 @@ rule mapping_human_cDNA:
         ref_params = STAR_refs_params['human_cDNA'],
 
     conda:
-        condas['ribosnake']
+        condas['ribosnake'],
+
+    resources:
+        cpus_per_task=12,
+        mem_mb=128000,
 
     shell:
         """
-        STAR --runThreadN 12 --twopassMode Basic \\
+        STAR --runThreadN {resources.cpus_per_task} --twopassMode Basic \\
             --genomeDir {params.ref_path} \\
             --readFilesIn {input.unmapped} \\
             --outFileNamePrefix {params.mapping_data}/STAR/{wildcards.sample_uniq}/human_cDNA. \\
@@ -435,11 +462,15 @@ rule mapping_human_genome:
         ref_params = STAR_refs_params['human_genome'],
 
     conda:
-        condas['ribosnake']
+        condas['ribosnake'],
+
+    resources:
+        cpus_per_task=12,
+        mem_mb=128000,
 
     shell:
         """
-        STAR --runThreadN 12 --twopassMode Basic \\
+        STAR --runThreadN {resources.cpus_per_task} --twopassMode Basic \\
             --genomeDir {params.ref_path} \\
             --readFilesIn {input.unmapped} \\
             --outFileNamePrefix {params.mapping_data}/STAR/{wildcards.sample_uniq}/human_genome. \\
@@ -464,6 +495,10 @@ rule split_fastq:
         umi_data = umi_data,
         mapping_data = mapping_data,
         split_n = mapping_data + 'STAR/{sample_uniq}/human_tRNA.Unmapped.out'
+
+    resources:
+        cpus_per_task=1,
+        mem_mb=16000,
 
     shell:
         """
@@ -500,11 +535,15 @@ rule RSEM_ref:
         RSEM_path = RSEM_path,
 
     conda:
-        condas['ribosnake']
+        condas['ribosnake'],
+
+    resources:
+        cpus_per_task=24,
+        mem_mb=128000,
 
     shell:
         """
-        rsem-prepare-reference --star --num-threads 24 \\
+        rsem-prepare-reference --star --num-threads {resources.cpus_per_task} \\
         --gtf {input.GTF} \\
         {input.genome} \\
         {params.RSEM_path}{params.ref_version}
@@ -535,6 +574,10 @@ rule STAR_RSEM:
     conda:
         condas['ribosnake'],
 
+    resources:
+        cpus_per_task=8,
+        mem_mb=64000,
+
     shell:
         """
         touch {output.STAR_echo}
@@ -553,10 +596,10 @@ rule STAR_RSEM:
             --alignIntronMin 20  \\
             --alignIntronMax 1000000  \\
             --alignMatesGapMax 1000000  \\
-            --alignSJoverhangMin 8  \\
             --alignSJDBoverhangMin 1  \\
+            --alignSJoverhangMin 8  \\
             --sjdbScore 1  \\
-            --runThreadN 8  \\
+            --runThreadN {resources.cpus_per_task}  \\
             --genomeLoad NoSharedMemory  \\
             --outSAMtype BAM Unsorted  \\
             --quantMode TranscriptomeSAM  \\
@@ -602,6 +645,10 @@ rule DEDUP_RSEM:
 
     conda:
         condas['ribosnake'],
+
+    resources:
+        cpus_per_task=4,
+        mem_mb=32000,
 
     shell:
         """
@@ -651,6 +698,10 @@ rule FORWARD_RSEM:
     conda:
         condas['ribosnake'],
 
+    resources:
+        cpus_per_task=4,
+        mem_mb=32000,
+
     shell:
         """
         touch {output.FW_echo}
@@ -698,6 +749,10 @@ rule RSEM:
     conda:
         condas['ribosnake'],
 
+    resources:
+        cpus_per_task=8,
+        mem_mb=64000,
+
     shell:
         """
         touch {output.RSEM_echo}
@@ -706,7 +761,7 @@ rule RSEM:
         for bc in $(cat {input.final_BC}); do 
             
             # RSEM count
-            rsem-calculate-expression --num-threads 8 \\
+            rsem-calculate-expression --num-threads {resources.cpus_per_task} \\
             --strandedness forward \\
             --seed-length 15 \\
             --alignments {params.RSEM_n}${{bc}}/human_genome.Aligned.toTranscriptome.dedup.sortedNameForward.bam \\
@@ -746,6 +801,10 @@ rule RSEM_DEPTH:
 
     conda:
         condas['ribosnake'],
+
+    resources:
+        cpus_per_task=4,
+        mem_mb=16000,
 
     shell:
         """
@@ -848,6 +907,13 @@ rule stats:
         rsem_data = rsem_data,
         stats_data = stats_data,
 
+    conda:
+        condas['ribosnake'],
+
+    resources:
+        cpus_per_task=10,
+        mem_mb=84000,
+
     shell:
         """
         # raw data
@@ -858,7 +924,7 @@ rule stats:
 
             if [ ! -f $stats_out ] && [ ! -f $stats_len ]; then
 
-                seqkit stats --tabular --threads 10 {params.raw_data}${{sample}}.fastq.gz > {params.stats_data}stats_${{sample}}.tmp
+                seqkit stats --tabular --threads {resources.cpus_per_task} {params.raw_data}${{sample}}.fastq.gz > {params.stats_data}stats_${{sample}}.tmp
     
                 num_seqs=$(cut -d$"\t" -f4 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
                 sum_len=$(cut -d$"\t" -f5 {params.stats_data}stats_${{sample}}.tmp | sed -n 2p)
@@ -884,7 +950,7 @@ rule stats:
 
             if [ ! -f $stats_out ] && [ ! -f $stats_len ]; then
 
-                seqkit stats --tabular --threads 10 {params.raw_data}${{sample_uniq}}.fastq.gz > {params.stats_data}stats_${{sample_uniq}}.tmp
+                seqkit stats --tabular --threads {resources.cpus_per_task} {params.raw_data}${{sample_uniq}}.fastq.gz > {params.stats_data}stats_${{sample_uniq}}.tmp
     
                 num_seqs=$(cut -d$"\t" -f4 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
                 sum_len=$(cut -d$"\t" -f5 {params.stats_data}stats_${{sample_uniq}}.tmp | sed -n 2p)
@@ -937,14 +1003,17 @@ rule QC:
         rsem_data = rsem_data,
         stats_data = stats_data,
         DB = ref_path + ref_version,
-        script = script
 
     conda:
         condas['ribosnake'],
 
+    resources:
+        cpus_per_task=10,
+        mem_mb=84000,
+
     shell:
         """
-        bash {params.work_dir}QC.sh {wildcards.sample_uniq} {params.work_dir} {params.DB} {params.script}
+        bash {params.work_dir}QC.sh {wildcards.sample_uniq} {params.work_dir} {params.DB}
         """
 
 
@@ -984,6 +1053,10 @@ rule QC_plot:
 
     conda:
         condas['ribosnake'],
+
+    resources:
+        cpus_per_task=2,
+        mem_mb=16000,
 
     shell:
         """
